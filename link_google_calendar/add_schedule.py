@@ -12,7 +12,7 @@ from googleapiclient.discovery import build
     # |calendar_id|: user email address
 
 def create_event(summary, start_time, end_time, calendar_id):
-    creds = service_account.Credentials.from_service_account_file('/content/drive/MyDrive/JPHACKS/jphack-tk-2306-100a02fa5204.json')
+    creds = service_account.Credentials.from_service_account_file('jphack-tk-2306-100a02fa5204.json')
     service = build('calendar', 'v3', credentials=creds)
     event = {
         'summary': summary,
