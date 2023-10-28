@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Button, TextField, Container, Typography, Box , Dialog, DialogTitle,DialogContent,DialogActions} from '@mui/material';
 import PopupContent from './PopupContent';
+import Banner from '../components/Banner';
 
 type Attribute = {
   name: string;
@@ -72,6 +73,7 @@ const TopPage: React.FC = () => {
 
   return (
     <Container>
+      <Banner />
       <Typography variant="h4">シフト管理 - 管理者画面</Typography>
       <Box>
         <TextField
