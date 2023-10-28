@@ -151,6 +151,7 @@ def get_initial_solutions(
             # 乱択に失敗し続けたらやり直す
             if failcnt > 20:
                 failcnt = 0
+                print("--------failed so reset!!!-------")
                 break
             # 両端を削っていく
             rnd_person = random.randint(0, number_of_people - 1)
@@ -175,13 +176,19 @@ def get_initial_solutions(
                 shift_requirements_per_time,
                 attribute_requirements_per_time,
             ):
+                print("deleted")
+                print("cur_state = ")
+                cur_state.print()
+                print(f"shift_requirements = {shift_requirements_per_time}")
+                print(f"attributes_requirements = {attribute_requirements_per_time}")
+                print(f"cur_solution = {cur_solution}")
                 if rnd % 2 == 0:
                     cur_solution[rnd_person][rnd // 2][0] = delete_time_end
                 else:
                     cur_solution[rnd_person][rnd // 2][1] = delete_time_start
 
-                print(f"cur_state = {cur_state.print()}")
-                print(f"cur_solution = {cur_solution}")
+                # print(f"cur_state = {cur_state.print()}")
+                # print(f"cur_solution = {cur_solution}")
                 if cur_state.is_ok(
                     shift_requirements_per_time, attribute_requirements_per_time
                 ):
@@ -196,26 +203,26 @@ def get_initial_solutions(
 def test():
     dummy_shift_preferences_per_person: list[list[tuple[int, int]]] = [
         [(1, 2), (2, 3), (4, 5)],
-        [(0, 1), (2, 3), (4, 5)],
+        [(0, 1), (3, 4), (4, 5)],
         [(0, 1), (1, 2), (4, 5)],
-        [(0, 1), (1, 2), (3, 4)],
+        [(0, 1), (2, 3), (3, 4)],
         [(0, 1), (3, 4), (4, 5)],
-        [(0, 1), (3, 4), (4, 5)],
+        [(0, 1), (2, 3), (4, 5)],
         [(0, 2), (3, 5)],
     ]
-    number_of_shifts = 6
+    number_of_shifts = 5
     number_of_people = 7
     number_of_attributes = 2
     dummy_shift_requirements_per_time: list[tuple[int, int]] = [
-        (2, 3)
+        (2, 5)
     ] * number_of_shifts
-    dummy_attributes_per_person: list[list[int]] = [[0, 1], [0, 1], [], [], [], [], []]
+    dummy_attributes_per_person: list[list[int]] = [[0, 1], [0, 1], [0, 1], [0, 1], [], [], []]
     dummy_attributes_requirements_per_time: list[list[tuple[int, int]]] = [
         [(1, 2), (1, 2)]
     ] * number_of_shifts
 
     solution = get_initial_solutions(
-        2,
+        0.5,
         number_of_people,
         number_of_shifts,
         number_of_attributes,
