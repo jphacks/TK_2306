@@ -12,3 +12,15 @@ uvicorn main:app --reload --port 9000
 cd db
 cat items.sql | sqlite3  db.sqlite
 ```
+## 使い方
+```
+curl http://localhost:9000
+```
+{"message":"Hello, world!"}
+```
+curl -X POST \
+  --url 'http://localhost:9000/items' \
+  -F 'name=jacket' \
+  -F 'category=fashion' \
+  -F 'image=@images/local_image.jpg'
+```
