@@ -24,11 +24,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from routers import users
+from routers import users, shifts, events
 app.include_router(users.router)
+app.include_router(shifts.router)
+app.include_router(events.router)
 
 
-def save_file(image: UploadFile) -> str | None:
+def save_file(image: UploadFile) -> str:
     extension = Path(image.filename).suffix if image.filename else '.png'
     try:
         content = image.file.read()
