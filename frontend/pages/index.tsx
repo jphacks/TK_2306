@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Button, TextField, Container, Typography, Box } from '@mui/material';
 
 type Attribute = {
   name: string;
@@ -29,7 +30,6 @@ const TopPage: React.FC = () => {
   const [groupUrl, setGroupUrl] = useState<string>('');
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [preferences, setPreferences] = useState<Preference[]>([]);
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
 
   const handleCreate = () => {
     const Id = uuidv4();
@@ -39,7 +39,7 @@ const TopPage: React.FC = () => {
     const postData = {
       group_id: Id,
       event_name: shiftName,
-      candidates,
+      // ... other fields
     };
 
     console.log('User URL:', generatedUserUrl);
@@ -55,44 +55,40 @@ const TopPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>シフト管理 - 管理者画面</h1>
-      <div>
-        <label>
-          シフト期間の開始日:
-          <input
-            type="date"
-            value={calendarStartDate}
-            onChange={(e) => setCalendarStartDate(e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          シフト期間の終了日:
-          <input
-            type="date"
-            value={calendarEndDate}
-            onChange={(e) => setCalendarEndDate(e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          シフト表の名前:
-          <input
-            type="text"
-            value={shiftName}
-            onChange={(e) => setShiftName(e.target.value)}
-          />
-        </label>
-      </div>
+    <Container>
+      <Typography variant="h4">シフト管理 - 管理者画面</Typography>
+      <Box>
+        <TextField
+          label="シフト期間の開始日"
+          type="date"
+          value={calendarStartDate}
+          onChange={(e) => setCalendarStartDate(e.target.value)}
+        />
+      </Box>
+      <Box>
+        <TextField
+          label="シフト期間の終了日"
+          type="date"
+          value={calendarEndDate}
+          onChange={(e) => setCalendarEndDate(e.target.value)}
+        />
+      </Box>
+      <Box>
+        <TextField
+          label="シフト表の名前"
+          value={shiftName}
+          onChange={(e) => setShiftName(e.target.value)}
+        />
+      </Box>
 
-      <button onClick={addAttribute}>Add Attribute</button>
+      <Button variant="contained" color="primary" onClick={addAttribute}>
+        Add Attribute
+      </Button>
+      {/* ... same for attributes and preferences ... */}
       {attributes.map((attr, index) => (
-        <div key={index}>
-          <input
-            placeholder="Attribute"
+        <Box key={index}>
+          <TextField
+            label="Attribute"
             value={attr.name}
             onChange={(e) => {
               const newAttributes = [...attributes];
@@ -100,9 +96,9 @@ const TopPage: React.FC = () => {
               setAttributes(newAttributes);
             }}
           />
-          <input
+          <TextField
+            label="Max People"
             type="number"
-            placeholder="Max People"
             value={attr.max_people}
             onChange={(e) => {
               const newAttributes = [...attributes];
@@ -110,9 +106,9 @@ const TopPage: React.FC = () => {
               setAttributes(newAttributes);
             }}
           />
-          <input
+          <TextField
+            label="Min People"
             type="number"
-            placeholder="Min People"
             value={attr.min_people}
             onChange={(e) => {
               const newAttributes = [...attributes];
@@ -120,14 +116,17 @@ const TopPage: React.FC = () => {
               setAttributes(newAttributes);
             }}
           />
-        </div>
+        </Box>
       ))}
 
-      <button onClick={addPreference}>Add Preference</button>
+      <Button variant="contained" color="primary" onClick={addPreference}>
+        Add Preference
+      </Button>
+
       {preferences.map((pref, index) => (
-        <div key={index}>
-          <input
-            placeholder="Preference"
+        <Box key={index}>
+          <TextField
+            label="Preference"
             value={pref.name}
             onChange={(e) => {
               const newPreferences = [...preferences];
@@ -135,8 +134,8 @@ const TopPage: React.FC = () => {
               setPreferences(newPreferences);
             }}
           />
-          <input
-            placeholder="Value"
+          <TextField
+            label="Value"
             value={pref.value}
             onChange={(e) => {
               const newPreferences = [...preferences];
@@ -144,12 +143,15 @@ const TopPage: React.FC = () => {
               setPreferences(newPreferences);
             }}
           />
-        </div>
+        </Box>
       ))}
 
-      <button onClick={handleCreate}>作成</button>
-      {groupUrl && <div>URL: {groupUrl}</div>}
-    </div>
+      <Button variant="contained" color="secondary" onClick={handleCreate}>
+        作成
+      </Button>
+
+      {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
+    </Container>
   );
 };
 
