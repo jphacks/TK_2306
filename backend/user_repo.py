@@ -10,18 +10,19 @@ logger.level = logging.DEBUG
 db_path = "../db/db.sqlite"
 
 class UserRepository:
-    def add_user(self, id, name, group_id):
+    def add_user(self, name, group_id):
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO users(id, name, group_id) VALUES (?, ?, ?)""", (id, name, group_id))
+                """INSERT INTO users(user_name, group_id) VALUES (?, ?) RETURNING id;""", (name, group_id))
+            res = cur.fetchall()[0][0]
             con.commit()
             con.close()
-            return True
+            return res
         except sqlite3.Error as err:
             logger.debug(err)
-            return False
+            return None
 
     def add_user_attributes(self, user_id, attr_id, value):
         try:
