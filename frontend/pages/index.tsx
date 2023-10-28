@@ -7,6 +7,11 @@ type Attribute = {
   min_people: number;
 };
 
+type Preference = {
+  name: string;
+  value: string;
+};
+
 type Candidate = {
   date: string;
   from: string;
@@ -14,7 +19,7 @@ type Candidate = {
   max_people: number;
   min_people: number;
   attr: Attribute[];
-  preference: string[];
+  preference: Preference[];
 };
 
 const TopPage: React.FC = () => {
@@ -23,6 +28,7 @@ const TopPage: React.FC = () => {
   const [shiftName, setShiftName] = useState<string>('');
   const [groupUrl, setGroupUrl] = useState<string>('');
   const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [preferences, setPreferences] = useState<Preference[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
 
   const handleCreate = () => {
@@ -30,8 +36,6 @@ const TopPage: React.FC = () => {
     const generatedUserUrl = `${Id}`;
     setGroupUrl(generatedUserUrl);
 
-    // POST request to save the data to the database
-    // You would typically use fetch or axios here to send the data to your server
     const postData = {
       group_id: Id,
       event_name: shiftName,
@@ -40,6 +44,14 @@ const TopPage: React.FC = () => {
 
     console.log('User URL:', generatedUserUrl);
     console.log('POST Data:', postData);
+  };
+
+  const addAttribute = () => {
+    setAttributes([...attributes, { name: '', max_people: 0, min_people: 0 }]);
+  };
+
+  const addPreference = () => {
+    setPreferences([...preferences, { name: '', value: '' }]);
   };
 
   return (
@@ -75,7 +87,66 @@ const TopPage: React.FC = () => {
           />
         </label>
       </div>
-      {/* Add your attributes and candidates input fields here */}
+
+      <button onClick={addAttribute}>Add Attribute</button>
+      {attributes.map((attr, index) => (
+        <div key={index}>
+          <input
+            placeholder="Attribute"
+            value={attr.name}
+            onChange={(e) => {
+              const newAttributes = [...attributes];
+              newAttributes[index].name = e.target.value;
+              setAttributes(newAttributes);
+            }}
+          />
+          <input
+            type="number"
+            placeholder="Max People"
+            value={attr.max_people}
+            onChange={(e) => {
+              const newAttributes = [...attributes];
+              newAttributes[index].max_people = Number(e.target.value);
+              setAttributes(newAttributes);
+            }}
+          />
+          <input
+            type="number"
+            placeholder="Min People"
+            value={attr.min_people}
+            onChange={(e) => {
+              const newAttributes = [...attributes];
+              newAttributes[index].min_people = Number(e.target.value);
+              setAttributes(newAttributes);
+            }}
+          />
+        </div>
+      ))}
+
+      <button onClick={addPreference}>Add Preference</button>
+      {preferences.map((pref, index) => (
+        <div key={index}>
+          <input
+            placeholder="Preference"
+            value={pref.name}
+            onChange={(e) => {
+              const newPreferences = [...preferences];
+              newPreferences[index].name = e.target.value;
+              setPreferences(newPreferences);
+            }}
+          />
+          <input
+            placeholder="Value"
+            value={pref.value}
+            onChange={(e) => {
+              const newPreferences = [...preferences];
+              newPreferences[index].value = e.target.value;
+              setPreferences(newPreferences);
+            }}
+          />
+        </div>
+      ))}
+
       <button onClick={handleCreate}>作成</button>
       {groupUrl && <div>URL: {groupUrl}</div>}
     </div>
