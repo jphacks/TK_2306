@@ -112,6 +112,6 @@ def get_free_time(date, start_time, end_time, calendarId):
             elif 'date' in event['start'].keys():
                 if event['start']['date'][0:10] == str(date)[0:10]:
                     for key in day_keys:
-                        day[day_keys] = 0
+                        day[key] = 0
         if not page_token:
             break
