@@ -1,8 +1,5 @@
 import logging
 import sqlite3
-from abc import ABCMeta, abstractmethod
-
-from pydantic.types import OptionalInt
 
 logger = logging.getLogger("uvicorn")
 logger.level = logging.DEBUG

@@ -1,8 +1,7 @@
 import logging
 import sqlite3
-from abc import ABCMeta, abstractmethod
 
-from pydantic.types import OptionalInt
+from typing import Optional
 
 logger = logging.getLogger("uvicorn")
 logger.level = logging.DEBUG
@@ -10,7 +9,7 @@ logger.level = logging.DEBUG
 db_path = "../db/db.sqlite3"
 
 class AdminRepository:
-    def get_group_id_by_name(self, name) -> OptionalInt:
+    def get_group_id_by_name(self, name) -> Optional[int]:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
@@ -26,7 +25,7 @@ class AdminRepository:
             logger.debug(err)
             return None
         
-    def add_event(self, id, name) -> OptionalInt:
+    def add_event(self, id, name) -> Optional[int]:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
@@ -41,7 +40,7 @@ class AdminRepository:
             logger.debug(err)
             return None
         
-    def get_date_id_by_group_id(self, group_id) -> OptionalInt:
+    def get_date_id_by_group_id(self, group_id) -> Optional[int]:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
