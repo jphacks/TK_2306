@@ -32,36 +32,42 @@ const TimeSlotTable: React.FC<TimeSlotTableProps> = ({ dates, candidateTimes, on
         {dates.map((date, index) => (
           <tr key={index}>
             <td>{date.toLocaleDateString()}</td>
-            <td className="time_container">
-              <span className={styles.candidateTime}>
-                {candidateTimes[index][0]} ~ {candidateTimes[index][1]}
-              </span>
-            </td>
-            <td className="time_container">
-              {Array.from({ length: candidateTimes.length / 2 }, (_, idx) => idx * 2).map((startIndex) => {
-                const endIndex = startIndex + 1;
-                const time1 = candidateTimes[startIndex];
-                const time2 = candidateTimes[endIndex];
-                return (
-                  <span key={startIndex} className={styles.candidateTime}>
-                    {`${time1} ~ ${time2}`}
-                  </span>
-                );
-              })}
+            <td>
+              {Array.from({ length: candidateTimes[index].length / 2 }, (_, idx) => idx * 2).slice(0, 4).map((startIndex) => {
+                  const endIndex = startIndex + 1;
+                  const time1 = candidateTimes[index][startIndex];
+                  const time2 = candidateTimes[index][endIndex];
+                  return (
+                    <span key={startIndex} className={styles.candidateTime}>
+                      {`${time1} ~ ${time2}`}
+                    </span>
+                  );
+                })}
             </td>
             <td>
-            <div className={styles.time_op}>
-              {Array.from({ length: 1 }, (_, index) => (
-                <div className={styles.timeContainer} key={index}>
-                  <input className={styles.timeInput} {...register(`dates[${index}].from_time`)} />
-                  <p> ~ </p>
-                  <input className={styles.timeInput} {...register(`dates[${index}].to_time`)} />
+              {fields.map((item, f_index) => (
+                <div className={styles.time_op}>
+                  <div key={item.id}>
+                    <div className={styles.timeContainer}>
+                      <input
+                        className={styles.timeInput}
+                        {...register(`dates[${f_index}].from_time`)}
+                      />
+                      <p> ~ </p>
+                      <input
+                        className={styles.timeInput}
+                        {...register(`dates[${f_index}].to_time`)}
+                      />
+                      <button type="button" onClick={() => remove(f_index)}>
+                        削除
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ))}
-            </div>
-            <button type="button" onClick={() => append({ from_time: '', to_time: '' })}>
-              行を追加
-            </button>
+              <button type="button" onClick={() => append({ from_time: '', to_time: '' })}>
+                行を追加
+              </button>
             </td>
           </tr>
         ))}

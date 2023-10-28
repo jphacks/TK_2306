@@ -39,8 +39,9 @@ const UserPage: React.FC = () => {
 
   const dates = [new Date('2023-11-01'), new Date('2023-11-02'), new Date('2023-11-03')];
   const candidateTimes = [
-    ["09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM"],
-    ["08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM"]
+    ["09:00", "09:30", "10:00", "10:30"],
+    ["08:30", "09:00", "09:30", "10:00"],
+    ["13:00", "14:00"]
   ];
 
 
@@ -110,9 +111,13 @@ const UserPage: React.FC = () => {
       </div>
       <div>
       <h1>希望日時選択</h1>
-      <TimeSlotTable dates={dates} candidateTimes={candidateTimes} onPreferenceChange={handlePreferenceChange} />
-      {/* 他の入力フィールドやボタンを追加 */}
+        <TimeSlotTable dates={dates} candidateTimes={candidateTimes} onPreferenceChange={handlePreferenceChange} />
     </div>
+    <div className={styles.buttonContainer}>
+        <button className={styles.createButton} onClick={handleSubmit}>
+          シフト生成
+        </button>
+      </div>
     </div>
   );
 };

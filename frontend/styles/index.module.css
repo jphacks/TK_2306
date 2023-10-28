@@ -8,12 +8,12 @@
   margin-bottom: 15px;
 }
 
-.buttoncontainer {
+.buttonContainer {
   display: flex;
   margin-top: 20px;
 }
 
-.createbutton {
+.createButton {
   background-color: #ccc;
   border: none;
   color: #000;
@@ -71,7 +71,7 @@
   margin-left: 10px;
 }
 
-.timeInput {
+.timeInput input{
   margin-right: 10px; /* 入力フィールドの間隔を調整 */
 }
 
