@@ -1,108 +1,85 @@
-// pages/index.tsx
-import { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
+import React, { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-const TopPage = () => {
-  const [eventName, setEventName] = useState('');
-  const [eventDate, setEventDate] = useState(new Date());
-  const [useDefault, setUseDefault] = useState(false);
-  const [fromTime, setFromTime] = useState('');
-  const [toTime, setToTime] = useState('');
-  const [people, setPeople] = useState({min: '', max: ''});
-  const [attributes, setAttributes] = useState([{ value: '', neededFrom: '', neededTo: '' }]);
-  const [preferences, setPreferences] = useState([{ preference: '', condition: '' }]);
-  
+type Attribute = {
+  name: string;
+  max_people: number;
+  min_people: number;
+};
+
+type Candidate = {
+  date: string;
+  from: string;
+  to: string;
+  max_people: number;
+  min_people: number;
+  attr: Attribute[];
+  preference: string[];
+};
+
+const TopPage: React.FC = () => {
+  const [calendarStartDate, setCalendarStartDate] = useState<string>('');
+  const [calendarEndDate, setCalendarEndDate] = useState<string>('');
+  const [shiftName, setShiftName] = useState<string>('');
+  const [groupUrl, setGroupUrl] = useState<string>('');
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+
   const handleCreate = () => {
-    // ここにPOSTリクエストのロジックを追加
-  }
+    const Id = uuidv4();
+    const generatedUserUrl = `${Id}`;
+    setGroupUrl(generatedUserUrl);
 
-  const addAttribute = () => {
-    setAttributes([...attributes, { value: '', neededFrom: '', neededTo: '' }]);
-  };
+    // POST request to save the data to the database
+    // You would typically use fetch or axios here to send the data to your server
+    const postData = {
+      group_id: Id,
+      event_name: shiftName,
+      candidates,
+    };
 
-  const addPreference = () => {
-    setPreferences([...preferences, { preference: '', condition: '' }]);
+    console.log('User URL:', generatedUserUrl);
+    console.log('POST Data:', postData);
   };
 
   return (
-    <div className="container">
-      <h1>Junan Shift</h1>
+    <div>
+      <h1>シフト管理 - 管理者画面</h1>
       <div>
-        <label>Event name</label>
-        <input 
-          type="text" 
-          value={eventName} 
-          onChange={(e) => setEventName(e.target.value)}
-        />
+        <label>
+          シフト期間の開始日:
+          <input
+            type="date"
+            value={calendarStartDate}
+            onChange={(e) => setCalendarStartDate(e.target.value)}
+          />
+        </label>
       </div>
-      {/* <div>
-        <label>Event Date</label>
-        <DatePicker selected={eventDate} onChange={(date: Date) => setEventDate(date)} />
-      </div> */}
-      {/* <div>
-        <input 
-          type="checkbox" 
-          checked={useDefault}
-          onChange={() => setUseDefault(prev => !prev)}
-        />
-        <label>Use Default Settings</label>
-      </div> */}
-      {useDefault && (
-        <div>
-          <label>from</label>
-          <select value={fromTime} onChange={(e) => setFromTime(e.target.value)}>
-            {/* ここに時間の選択肢を追加 */}
-          </select>
-          <label>to</label>
-          <select value={toTime} onChange={(e) => setToTime(e.target.value)}>
-            {/* ここに時間の選択肢を追加 */}
-          </select>
-          <label>people</label>
-          <input type="number" value={people.min} onChange={(e) => setPeople({...people, min: e.target.value})} />
-          <span>~</span>
-          <input type="number" value={people.max} onChange={(e) => setPeople({...people, max: e.target.value})} />
-          {/* 属性とpreferenceの追加ボタンもここに追加 */}
-          {/* <div>
-            {attributes.map((attr, index) => (
-              <div key={index}>
-                <input
-                  placeholder="attributes"
-                  value={attr.value}
-                  onChange={(e) => {
-                    const newAttributes = [...attributes];
-                    newAttributes[index].value = e.target.value;
-                    setAttributes(newAttributes);
-                  }}
-                />
-                <input
-                  placeholder="needed"
-                  value={attr.neededFrom}
-                  onChange={(e) => {
-                    const newAttributes = [...attributes];
-                    newAttributes[index].neededFrom = e.target.value;
-                    setAttributes(newAttributes);
-                  }}
-                />
-                <span>~</span>
-                <input
-                  value={attr.neededTo}
-                  onChange={(e) => {
-                    const newAttributes = [...attributes];
-                    newAttributes[index].neededTo = e.target.value;
-                    setAttributes(newAttributes);
-                  }}
-                />
-              </div>
-            ))}
-            <button onClick={addAttribute}>+ add attribute</button>
-          </div> */}
-          <button onClick={addPreference}>+ add preference</button>
-        </div>
-      )}
-      <button onClick={handleCreate}>Create</button>
+      <div>
+        <label>
+          シフト期間の終了日:
+          <input
+            type="date"
+            value={calendarEndDate}
+            onChange={(e) => setCalendarEndDate(e.target.value)}
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          シフト表の名前:
+          <input
+            type="text"
+            value={shiftName}
+            onChange={(e) => setShiftName(e.target.value)}
+          />
+        </label>
+      </div>
+      {/* Add your attributes and candidates input fields here */}
+      <button onClick={handleCreate}>作成</button>
+      {groupUrl && <div>URL: {groupUrl}</div>}
     </div>
   );
-}
+};
 
 export default TopPage;
