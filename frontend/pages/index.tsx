@@ -1,7 +1,20 @@
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Button, TextField, Container, Typography, Box , Dialog, DialogTitle,DialogContent,DialogActions} from '@mui/material';
-import PopupContent from './PopupContent';
+import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import {
+  Button,
+  TextField,
+  Container,
+  Typography,
+  Box,
+  Grid,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
+import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
+import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
+import Dialog from "@mui/material/Dialog";
+import PopupContent from "./PopupContent";
+import Banner from '../components/Banner';
 
 type Attribute = {
   name: string;
@@ -25,14 +38,11 @@ type Candidate = {
 };
 
 const TopPage: React.FC = () => {
-  const [calendarStartDate, setCalendarStartDate] = useState<string>('');
-  const [calendarEndDate, setCalendarEndDate] = useState<string>('');
-  const [shiftName, setShiftName] = useState<string>('');
-  const [groupUrl, setGroupUrl] = useState<string>('');
+  const [shiftName, setShiftName] = useState<string>("");
+  const [groupUrl, setGroupUrl] = useState<string>("");
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [openPopup, setOpenPopup] = useState(false);
-
 
   const handleCreate = () => {
     const Id = uuidv4();
@@ -45,10 +55,9 @@ const TopPage: React.FC = () => {
       // ... other fields
     };
 
-    console.log('User URL:', generatedUserUrl);
-    console.log('POST Data:', postData);
+    console.log("User URL:", generatedUserUrl);
+    console.log("POST Data:", postData);
   };
-
 
   const handlePopupOpen = () => {
     // ... 既存のコード ...
@@ -63,122 +72,119 @@ const TopPage: React.FC = () => {
   };
 
   const addAttribute = () => {
-    setAttributes([...attributes, { name: '', max_people: 0, min_people: 0 }]);
+    setAttributes([...attributes, { name: "", max_people: 0, min_people: 0 }]);
   };
 
   const addPreference = () => {
-    setPreferences([...preferences, { name: '', value: '' }]);
+    setPreferences([...preferences, { name: "", value: "" }]);
   };
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    handlePopupOpen();
+  };
+
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: "#D9D9D9",
+      },
+    },
+  });
 
   return (
     <Container>
-      <Typography variant="h4">シフト管理 - 管理者画面</Typography>
-      <Box>
-        <TextField
-          label="シフト期間の開始日"
-          type="date"
-          value={calendarStartDate}
-          onChange={(e) => setCalendarStartDate(e.target.value)}
-        />
-      </Box>
-      <Box>
-        <TextField
-          label="シフト期間の終了日"
-          type="date"
-          value={calendarEndDate}
-          onChange={(e) => setCalendarEndDate(e.target.value)}
-        />
-      </Box>
-      <Box>
-        <TextField
-          label="シフト表の名前"
-          value={shiftName}
-          onChange={(e) => setShiftName(e.target.value)}
-        />
-      </Box>
-
-      <Button variant="contained" color="primary" onClick={addAttribute}>
-        Add Attribute
-      </Button>
-      {/* ... same for attributes and preferences ... */}
-      {attributes.map((attr, index) => (
-        <Box key={index}>
+      <ThemeProvider theme={theme}>
+        <Banner/>
+        <Typography variant="h4">シフト管理 - 管理者画面</Typography>
+        <Box>
           <TextField
-            label="Attribute"
-            value={attr.name}
-            onChange={(e) => {
-              const newAttributes = [...attributes];
-              newAttributes[index].name = e.target.value;
-              setAttributes(newAttributes);
-            }}
-          />
-          <TextField
-            label="Max People"
-            type="number"
-            value={attr.max_people}
-            onChange={(e) => {
-              const newAttributes = [...attributes];
-              newAttributes[index].max_people = Number(e.target.value);
-              setAttributes(newAttributes);
-            }}
-          />
-          <TextField
-            label="Min People"
-            type="number"
-            value={attr.min_people}
-            onChange={(e) => {
-              const newAttributes = [...attributes];
-              newAttributes[index].min_people = Number(e.target.value);
-              setAttributes(newAttributes);
-            }}
+            label="シフト表の名前"
+            value={shiftName}
+            onChange={(e) => setShiftName(e.target.value)}
           />
         </Box>
-      ))}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateCalendar onChange={handleDateChange} />
+          <Dialog open={openPopup} onClose={handlePopupClose}>
+            <PopupContent onClose={handlePopupClose} />
+          </Dialog>
+        </LocalizationProvider>
 
-      <Button variant="contained" color="primary" onClick={addPreference}>
-        Add Preference
-      </Button>
+        <Button variant="contained" color="primary" onClick={addAttribute}>
+          Add Attribute
+        </Button>
+        {/* ... same for attributes and preferences ... */}
+        {attributes.map((attr, index) => (
+          <Box key={index}>
+            <TextField
+              label="Attribute"
+              value={attr.name}
+              onChange={(e) => {
+                const newAttributes = [...attributes];
+                newAttributes[index].name = e.target.value;
+                setAttributes(newAttributes);
+              }}
+            />
+            <TextField
+              label="Max People"
+              type="number"
+              value={attr.max_people}
+              onChange={(e) => {
+                const newAttributes = [...attributes];
+                newAttributes[index].max_people = Number(e.target.value);
+                setAttributes(newAttributes);
+              }}
+            />
+            <TextField
+              label="Min People"
+              type="number"
+              value={attr.min_people}
+              onChange={(e) => {
+                const newAttributes = [...attributes];
+                newAttributes[index].min_people = Number(e.target.value);
+                setAttributes(newAttributes);
+              }}
+            />
+          </Box>
+        ))}
 
-      {preferences.map((pref, index) => (
-        <Box key={index}>
-          <TextField
-            label="Preference"
-            value={pref.name}
-            onChange={(e) => {
-              const newPreferences = [...preferences];
-              newPreferences[index].name = e.target.value;
-              setPreferences(newPreferences);
-            }}
-          />
-          <TextField
-            label="Value"
-            value={pref.value}
-            onChange={(e) => {
-              const newPreferences = [...preferences];
-              newPreferences[index].value = e.target.value;
-              setPreferences(newPreferences);
-            }}
-          />
-        </Box>
-      ))}
+        <Button variant="contained" color="primary" onClick={addPreference}>
+          Add Preference
+        </Button>
 
-      <Button variant="contained" color="secondary" onClick={handleCreate}>
-        作成
-      </Button>
+        {preferences.map((pref, index) => (
+          <Box key={index}>
+            <TextField
+              label="Preference"
+              value={pref.name}
+              onChange={(e) => {
+                const newPreferences = [...preferences];
+                newPreferences[index].name = e.target.value;
+                setPreferences(newPreferences);
+              }}
+            />
+            <TextField
+              label="Value"
+              value={pref.value}
+              onChange={(e) => {
+                const newPreferences = [...preferences];
+                newPreferences[index].value = e.target.value;
+                setPreferences(newPreferences);
+              }}
+            />
+          </Box>
+        ))}
 
-      <Button variant="contained" color="primary" onClick={handlePopupOpen}>
-        Open Popup
-      </Button>
+        <Button variant="contained" color="secondary" onClick={handleCreate}>
+          作成
+        </Button>
 
-
-
-      <Dialog open={openPopup} onClose={handlePopupClose}>
-        <PopupContent onClose={handlePopupClose}/>
-      </Dialog>
-
-
-
-      {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
+        {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
+      </ThemeProvider>
     </Container>
   );
 };
