@@ -37,12 +37,12 @@ class UserRepository:
             logger.debug(err)
             return False
 
-    def add_user_dates(self, user_id, time_from, time_to):
+    def add_user_dates(self, user_id, date, time_from, time_to):
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO user_dates(user_id, time_from, time_to) VALUES (?, ?, ?)""", (user_id, time_from, time_to))
+                """INSERT INTO user_dates(user_id, date, time_from, time_to) VALUES (?, ?, ?, ?)""", (user_id, date, time_from, time_to))
             con.commit()
             con.close()
             return True
