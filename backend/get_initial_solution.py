@@ -106,30 +106,30 @@ def get_initial_solutions(
     debug = False,
 ) -> list[list[list[list[int, int]]]]:
     """
-    絶対満たすべき条件を満たす初期解をlimit_time_msec以内に乱択でたくさん生成する
+    絶対満たすべき条件を満たす初期解を乱択でたくさん生成する
 
     Parameters
     ----------
-    limit_time_sec : float
-        何秒で終了するか
-    number_of_people : int
+    `limit_time_sec : float`
+        何秒で打ち切るか
+    `number_of_people : int`
         人数
-    number_of_shifts : int
+    `number_of_shifts : int`
         時間帯の数
-    number_of_attirbutes: int
+    `number_of_attirbutes: int`
         絶対に満たすべき属性の数
-    shift_preferences_per_person : list[list[tuple[int, int]]]
-        各人の[from, to)の希望(複数を許す)
-        e.g) shift_prefernces_per_person[0] = [(1, 2), (3, 5)] なら0番の人のシフト希望は1番目の時間帯と、3・4番目の時間帯
-    shift_requirements_per_time : list[tuple[int, int]]
-        各時間帯に配置すべき人数の[min,max]
-        e.g) shift_requirements_per_time[1] = (2, 4) なら1番目の時間帯に配置すべき人は2人以上4人以下
-    attributes_per_person : list[list[int]]
-        各人の属性
-        e.g) attributes_per_person[1] = [2, 3] なら1番の人の持つ属性は2と3
-    attribute_requirements_per_time : list[list[tuple[int, int]]]
-        各時間帯について、各属性の人数の[min,max]
-        e.g) attributes_requirements_per_time[0] = [[1, 2], [2, 3]] なら0番目の時間帯で、0番の属性は1人以上2人以下、1番の属性は2人以上3人以下
+    `shift_preferences_per_person : list[list[tuple[int, int]]]`
+        各人の[from, to)の希望(複数を許す)\n
+        e.g) `shift_prefernces_per_person[0] = [(1, 2), (3, 5)]` なら0番の人のシフト希望は1番目の時間帯と、3・4番目の時間帯
+    `shift_requirements_per_time : list[tuple[int, int]]`
+        各時間帯に配置すべき人数の[min,max]\n
+        e.g) `shift_requirements_per_time[1] = (2, 4)` なら1番目の時間帯に配置すべき人は2人以上4人以下
+    `attributes_per_person : list[list[int]]`
+        各人の属性\n
+        e.g) `attributes_per_person[1] = [2, 3]` なら1番の人の持つ属性は2と3
+    `attribute_requirements_per_time : list[list[tuple[int, int]]]`
+        各時間帯について、各属性の人数の[min,max]\n
+        e.g) `attributes_requirements_per_time[0] = [[1, 2], [2, 3]]` なら0番目の時間帯で、0番の属性は1人以上2人以下、1番の属性は2人以上3人以下
     """
     assert len(shift_preferences_per_person) == number_of_people
     assert len(shift_requirements_per_time) == number_of_shifts
