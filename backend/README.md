@@ -7,3 +7,8 @@ pip install -r requirements.txt
 ```
 uvicorn main:app --reload --port 9000
 ```
+## DB作成
+```
+cd db
+cat items.sql | sqlite3  db.sqlite
+```
