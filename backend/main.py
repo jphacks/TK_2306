@@ -5,7 +5,6 @@ from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import hashlib
-from typing import Optional
 from pathlib import Path
 
 from db import SqliteItemsRepository
@@ -25,8 +24,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from routers import users
+app.include_router(users.router)
 
-def save_file(image: UploadFile) -> Optional[str]:
+
+def save_file(image: UploadFile) -> str | None:
     extension = Path(image.filename).suffix if image.filename else '.png'
     try:
         content = image.file.read()
