@@ -1,14 +1,12 @@
 import React from 'react';
+import banner_styles from 'styles/Banner.module.css';
 
 function Banner() {
   return (
-    <div className="banner">
-      <h1>Welcome to Our Online Store</h1>
-      <p>Discover a world of products and savings.</p>
-      <a href="/shop" className="cta-button">Shop Now</a>
-
-
-
+    <div className={banner_styles.banner}>
+      <img src="banner_calender.svg" alt="Banner Image" />
+      <h1>Junan Shift</h1>
+      <img src="banner_calender.svg" alt="Banner Image" />
     </div>
   );
 }
