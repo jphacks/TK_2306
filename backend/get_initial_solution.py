@@ -103,6 +103,7 @@ def get_initial_solutions(
     shift_requirements_per_time: list[tuple[int, int]],
     attributes_per_person: list[list[int]],
     attribute_requirements_per_time: list[list[tuple[int, int]]],
+    debug = False,
 ) -> list[list[list[list[int, int]]]]:
     """
     絶対満たすべき条件を満たす初期解をlimit_time_msec以内に乱択でたくさん生成する
@@ -151,7 +152,8 @@ def get_initial_solutions(
             # 乱択に失敗し続けたらやり直す
             if failcnt > 20:
                 failcnt = 0
-                print("--------failed so reset!!!-------")
+                if debug:
+                    print("--------failed so reset!!!-------")
                 break
             # 両端を削っていく
             rnd_person = random.randint(0, number_of_people - 1)
@@ -176,12 +178,13 @@ def get_initial_solutions(
                 shift_requirements_per_time,
                 attribute_requirements_per_time,
             ):
-                print("deleted")
-                print("cur_state = ")
-                cur_state.print()
-                print(f"shift_requirements = {shift_requirements_per_time}")
-                print(f"attributes_requirements = {attribute_requirements_per_time}")
-                print(f"cur_solution = {cur_solution}")
+                if debug:
+                    print("deleted")
+                    print("cur_state = ")
+                    cur_state.print()
+                    print(f"shift_requirements = {shift_requirements_per_time}")
+                    print(f"attributes_requirements = {attribute_requirements_per_time}")
+                    print(f"cur_solution = {cur_solution}")
                 if rnd % 2 == 0:
                     cur_solution[rnd_person][rnd // 2][0] = delete_time_end
                 else:
@@ -192,7 +195,8 @@ def get_initial_solutions(
                 if cur_state.is_ok(
                     shift_requirements_per_time, attribute_requirements_per_time
                 ):
-                    print("ok!!!")
+                    if debug:
+                        print("ok!!!")
                     ret.append(cur_solution)
                     break
             else:
@@ -214,7 +218,7 @@ def test():
     number_of_people = 7
     number_of_attributes = 2
     dummy_shift_requirements_per_time: list[tuple[int, int]] = [
-        (2, 5)
+        (2, 4)
     ] * number_of_shifts
     dummy_attributes_per_person: list[list[int]] = [[0, 1], [0, 1], [0, 1], [0, 1], [], [], []]
     dummy_attributes_requirements_per_time: list[list[tuple[int, int]]] = [
@@ -230,6 +234,7 @@ def test():
         dummy_shift_requirements_per_time,
         dummy_attributes_per_person,
         dummy_attributes_requirements_per_time,
+        debug=False,
     )
     print("ans = ")
     print(solution)
