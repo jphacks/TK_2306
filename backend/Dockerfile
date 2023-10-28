@@ -14,7 +14,6 @@ RUN apk --update-cache add \
 
 RUN cat /app/db/items.sql | sqlite3 /app/db/db.sqlite3
 
-RUN chown trainee:mercari /app/db/mercari.sqlite3
 
 RUN pip install --upgrade pip
 RUN pip install -r /app/backend/requirements.txt

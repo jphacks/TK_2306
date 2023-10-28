@@ -24,3 +24,8 @@ curl -X POST \
   -F 'category=fashion' \
   -F 'image=@images/local_image.jpg'
 ```
+
+## Docker
+```
+docker build . --file backend/Dockerfile
+```
