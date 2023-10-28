@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Button, TextField, Container, Typography, Box } from '@mui/material';
+import { Button, TextField, Container, Typography, Box , Dialog, DialogTitle,DialogContent,DialogActions} from '@mui/material';
+import PopupContent from './PopupContent';
 
 type Attribute = {
   name: string;
@@ -30,6 +31,8 @@ const TopPage: React.FC = () => {
   const [groupUrl, setGroupUrl] = useState<string>('');
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [preferences, setPreferences] = useState<Preference[]>([]);
+  const [openPopup, setOpenPopup] = useState(false);
+
 
   const handleCreate = () => {
     const Id = uuidv4();
@@ -44,6 +47,19 @@ const TopPage: React.FC = () => {
 
     console.log('User URL:', generatedUserUrl);
     console.log('POST Data:', postData);
+  };
+
+
+  const handlePopupOpen = () => {
+    // ... 既存のコード ...
+
+    // ポップアップを表示
+    setOpenPopup(true);
+  };
+
+  const handlePopupClose = () => {
+    // ポップアップを閉じる
+    setOpenPopup(false);
   };
 
   const addAttribute = () => {
@@ -149,6 +165,18 @@ const TopPage: React.FC = () => {
       <Button variant="contained" color="secondary" onClick={handleCreate}>
         作成
       </Button>
+
+      <Button variant="contained" color="primary" onClick={handlePopupOpen}>
+        Open Popup
+      </Button>
+
+
+
+      <Dialog open={openPopup} onClose={handlePopupClose}>
+        <PopupContent onClose={handlePopupClose}/>
+      </Dialog>
+
+
 
       {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
     </Container>
