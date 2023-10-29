@@ -3,12 +3,14 @@ import DialogTitle from '@mui/material/DialogTitle'; // DialogTitleをインポ�
 import DialogContent from '@mui/material/DialogContent'; // DialogContentをインポート
 import DialogActions from '@mui/material/DialogActions'; // DialogActionsをインポート
 import Button from '@mui/material/Button'; // Buttonをインポート// PopupContent.js
+import DateDetail from './test';
 
 function PopupContent({onClose}) {
   return (
     <div>
       <DialogTitle>ポップアップタイトル</DialogTitle>
       <DialogContent>
+        <DateDetail />
         <p>ポップアップのコンテンツ</p>
       </DialogContent>
       <DialogActions>
