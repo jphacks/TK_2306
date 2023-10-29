@@ -24,8 +24,8 @@
     min_time:
         min_time[i][j] が従事者 i が j 日目に希望する最低労働時間
     constraints:list[tuple[list[int],Parameter_Type]]
-        追加の要求を表す。ここで、Parameter_Typeは以下で定義されている
-        
+        追加の要求を表す。ここで、Parameter_Type は type_.py内に以下で定義されている。
+
         class Parameter_Type:
             workers_concentrate = 0 #働いてる人が同じ日に同じ属性が集中
             workers_scatter = 1
