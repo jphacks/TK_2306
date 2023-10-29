@@ -1155,7 +1155,7 @@ const TopPage: React.FC = () => {
   };
 
   return (
-    <Container>
+    <Container disableGutters maxWidth={false}>
       <Theme>
         <Banner />
         <Typography variant="h4">シフト管理 - 管理者画面</Typography>
@@ -1285,69 +1285,276 @@ const TopPage: React.FC = () => {
         {attributes.map((attr, index) => (
           <Box key={index}>
             <TextField
-              label="Attribute"
-              value={attr.name}
-              onChange={(e) => {
-                const newAttributes = [...attributes];
-                newAttributes[index].name = e.target.value;
-                setAttributes(newAttributes);
-              }}
-            />
-            <TextField
-              label="Max People"
-              type="number"
-              value={attr.max_people}
-              onChange={(e) => {
-                const newAttributes = [...attributes];
-                newAttributes[index].max_people = Number(e.target.value);
-                setAttributes(newAttributes);
-              }}
-            />
-            <TextField
-              label="Min People"
-              type="number"
-              value={attr.min_people}
-              onChange={(e) => {
-                const newAttributes = [...attributes];
-                newAttributes[index].min_people = Number(e.target.value);
-                setAttributes(newAttributes);
-              }}
+              label="シフト表の名前"
+              value={shiftName}
+              onChange={(e) => setShiftName(e.target.value)}
             />
           </Box>
-        ))}
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateCalendar onChange={handleDateChange} />
+            <Dialog open={openPopup} onClose={handlePopupClose} maxWidth="md">
+              <DialogTitle>ポップアップタイトル</DialogTitle>
+              <DialogContent>
+                <DateDetail1>
+                  <Q20231029>{`2023/10/29`}</Q20231029>
+                  <Rectangle7></Rectangle7>
+                  <From>{`from`}</From>
+                  <Section>{`Section`}</Section>
+                  <To>{`to`}</To>
+                  <Group1>
+                    <Rectangle4></Rectangle4>
+                    {/* <Polygon1 src={Polygon1Image} loading='lazy' alt={"Polygon 1"}/> */}
+                  </Group1>
+                  <Group2>
+                    <Rectangle41></Rectangle41>
+                    {/* <Polygon11 src={Polygon11Image} loading='lazy' alt={"Polygon 1"}/> */}
+                  </Group2>
+                  <Group11>
+                    <Rectangle42></Rectangle42>
+                    {/* <Polygon12 src={Polygon12Image} loading='lazy' alt={"Polygon 1"}/> */}
+                  </Group11>
+                  <Group7>
+                    <Rectangle43></Rectangle43>
+                  </Group7>
+                  <People>{`people`}</People>
+                  <Q>{`~`}</Q>
+                  <Group8>
+                    <Rectangle44></Rectangle44>
+                  </Group8>
+                  <To1>{`to`}</To1>
+                  <AddNewSection>{`+ add new section`}</AddNewSection>
+                  <span
+                    style={{
+                      textAlign: `left`,
+                      whiteSpace: `pre-wrap`,
+                      fontSynthesis: `none`,
+                      color: `rgba(50, 181, 255, 1)`,
+                      fontStyle: `normal`,
+                      fontFamily: `Alatsi`,
+                      fontWeight: `400`,
+                      fontSize: `24px`,
+                      letterSpacing: `0.24px`,
+                      textDecoration: `none`,
+                      textTransform: `none`,
+                      position: `absolute`,
+                      left: `193px`,
+                      top: `434px`,
+                    }}
+                    onClick={addAttribute}
+                  >
+                    Add Attribute
+                  </span>
+                  {attributes.map((attr, index) => (
+                    <Box key={index}>
+                      <TextField
+                        label="Attribute"
+                        value={attr.name}
+                        onChange={(e) => {
+                          const newAttributes = [...attributes];
+                          newAttributes[index].name = e.target.value;
+                          setAttributes(newAttributes);
+                        }}
+                      />
+                      <TextField
+                        label="Max People"
+                        type="number"
+                        value={attr.max_people}
+                        onChange={(e) => {
+                          const newAttributes = [...attributes];
+                          newAttributes[index].max_people = Number(
+                            e.target.value
+                          );
+                          setAttributes(newAttributes);
+                        }}
+                      />
+                      <TextField
+                        label="Min People"
+                        type="number"
+                        value={attr.min_people}
+                        onChange={(e) => {
+                          const newAttributes = [...attributes];
+                          newAttributes[index].min_people = Number(
+                            e.target.value
+                          );
+                          setAttributes(newAttributes);
+                        }}
+                      />
+                    </Box>
+                  ))}
+                  <AddPreference>{`+ add preference`}</AddPreference>
+                  <Rectangle8></Rectangle8>
+                  <Group6>
+                    <Line1></Line1>
+                    <Line2></Line2>
+                  </Group6>
+                  <Enter>{`Enter`}</Enter>
+                  <Group9>
+                    <Attributes>{`attributes`}</Attributes>
+                    <Needed>{`needed`}</Needed>
+                    <Q1>{`~`}</Q1>
+                    <Rectangle6></Rectangle6>
+                    <Rectangle71></Rectangle71>
+                    <Group3>
+                      <Rectangle5></Rectangle5>
+                    </Group3>
+                  </Group9>
+                  <Preference>{`preference`}</Preference>
+                  <ShouldBe>{`should be `}</ShouldBe>
+                  <Group31>
+                    <Rectangle51></Rectangle51>
+                  </Group31>
+                  <Line5></Line5>
+                  <Line6></Line6>
+                  <Group111>
+                    <Rectangle45></Rectangle45>
+                  </Group111>
+                  <Group12>
+                    <Rectangle46></Rectangle46>
+                    <Dvided>{`dvided`}</Dvided>
+                    <Together>{`together`}</Together>
+                  </Group12>
+                  <Rectangle10></Rectangle10>
+                  <Rectangle11></Rectangle11>
+                  <From1>{`from`}</From1>
+                  <Section1>{`Section`}</Section1>
+                  <To2>{`to`}</To2>
+                  <Group91>
+                    <Rectangle47></Rectangle47>
+                    {/* <Polygon13 src={Polygon13Image} loading='lazy' alt={"Polygon 1"}/> */}
+                  </Group91>
+                  <Group10>
+                    <Rectangle48></Rectangle48>
+                    {/* <Polygon14 src={Polygon14Image} loading='lazy' alt={"Polygon 1"}/> */}
+                  </Group10>
+                  <Group112>
+                    <Rectangle49></Rectangle49>
+                  </Group112>
+                  <People1>{`people`}</People1>
+                  <Q2>{`~`}</Q2>
+                  <Group121>
+                    <Rectangle410></Rectangle410>
+                  </Group121>
+                  <To3>{`to`}</To3>
+                  <AddAttribute1>{`+ add attribute`}</AddAttribute1>
+                  <AddPreference1>{`+ add preference`}</AddPreference1>
+                  <Line51></Line51>
+                  <Line61></Line61>
+                </DateDetail1>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handlePopupClose} color="primary">
+                  閉じる
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </LocalizationProvider>
 
-        <Button variant="contained" color="primary" onClick={addPreference}>
-          Add Preference
-        </Button>
+          <Button variant="contained" color="primary" onClick={addAttribute}>
+            Add Attribute
+          </Button>
+          {attributes.map((attr, index) => (
+            <Box key={index}>
+              <TextField
+                label="Attribute"
+                value={attr.name}
+                onChange={(e) => {
+                  const newAttributes = [...attributes];
+                  newAttributes[index].name = e.target.value;
+                  setAttributes(newAttributes);
+                }}
+              />
+              <TextField
+                label="Max People"
+                type="number"
+                value={attr.max_people}
+                onChange={(e) => {
+                  const newAttributes = [...attributes];
+                  newAttributes[index].max_people = Number(e.target.value);
+                  setAttributes(newAttributes);
+                }}
+              />
+              <TextField
+                label="Min People"
+                type="number"
+                value={attr.min_people}
+                onChange={(e) => {
+                  const newAttributes = [...attributes];
+                  newAttributes[index].min_people = Number(e.target.value);
+                  setAttributes(newAttributes);
+                }}
+              />
+            </Box>
+          ))}
 
-        {preferences.map((pref, index) => (
-          <Box key={index}>
-            <TextField
-              label="Preference"
-              value={pref.name}
-              onChange={(e) => {
-                const newPreferences = [...preferences];
-                newPreferences[index].name = e.target.value;
-                setPreferences(newPreferences);
-              }}
-            />
-            <TextField
-              label="Value"
-              value={pref.value}
-              onChange={(e) => {
-                const newPreferences = [...preferences];
-                newPreferences[index].value = e.target.value;
-                setPreferences(newPreferences);
-              }}
-            />
-          </Box>
-        ))}
+          <Button variant="contained" color="primary" onClick={addPreference}>
+            Add Preference
+          </Button>
 
-        <Button variant="contained" color="primary" onClick={handleCreate}>
-          作成
-        </Button>
+          {preferences.map((pref, index) => (
+            <Box key={index}>
+              <TextField
+                label="Preference"
+                value={pref.name}
+                onChange={(e) => {
+                  const newPreferences = [...preferences];
+                  newPreferences[index].name = e.target.value;
+                  setPreferences(newPreferences);
+                }}
+              />
+              <TextField
+                label="Value"
+                value={pref.value}
+                onChange={(e) => {
+                  const newPreferences = [...preferences];
+                  newPreferences[index].value = e.target.value;
+                  setPreferences(newPreferences);
+                }}
+              />
+            </Box>
+          ))}
 
-        {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
+          <Button variant="contained" color="primary" onClick={addPreference}>
+            Add Preference
+          </Button>
+
+          {preferences.map((pref, index) => (
+            <Box key={index}>
+              <TextField
+                label="Preference"
+                value={pref.name}
+                onChange={(e) => {
+                  const newPreferences = [...preferences];
+                  newPreferences[index].name = e.target.value;
+                  setPreferences(newPreferences);
+                }}
+              />
+              <TextField
+                label="Value"
+                value={pref.value}
+                onChange={(e) => {
+                  const newPreferences = [...preferences];
+                  newPreferences[index].value = e.target.value;
+                  setPreferences(newPreferences);
+                }}
+              />
+            </Box>
+          ))}
+
+          <Button variant="contained" color="secondary" onClick={handleCreate}>
+            作成
+          </Button>
+
+          <Button variant="contained" color="primary" onClick={handlePopupOpen}>
+            Open Popup
+          </Button>
+
+
+
+
+
+
+          {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
+        </Container>
       </Theme>
     </Container>
   );
