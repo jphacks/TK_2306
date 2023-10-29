@@ -14,6 +14,8 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
+const URL = process.env.API_URL || 'http://localhost:9000';
+
 type Attribute = {
   name: string;
   max_people: number;
@@ -92,7 +94,7 @@ const TopPage: React.FC = () => {
 
     const post = async () => {
       const response = await axios.post(
-        "http://127.0.0.1:9000/events",
+        `${URL}/events`,
         postData
       );
     };

@@ -9,6 +9,8 @@ import Banner from "../../components/Banner";
 import { useForm} from "react-hook-form";
 import { get } from "http";
 
+const URL = process.env.API_URL || 'http://localhost:9000';
+
 type UserAttribute = {
   id: number;
   name: string;
@@ -39,7 +41,7 @@ const UserPage: React.FC = () => {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:9000/attrs/${id}`)
+    fetch(`${URL}/attrs/${id}`)
       .then(async (response) => {
         if (!response.ok) {
           console.error("Error fetching attributes");
@@ -52,7 +54,7 @@ const UserPage: React.FC = () => {
         console.log("User attributes:", response["attrs"]);
       });
     
-    fetch(`http://localhost:9000/dates/${id}`)
+    fetch(`${URL}/dates/${id}`)
       .then(async (response) => {
         if (!response.ok) {
           console.error("Error fetching attributes");
@@ -106,7 +108,7 @@ const UserPage: React.FC = () => {
       dates: getCandidates(),
     };
     console.log("POST Data:", postData);
-    const _ = await axios.post("http://127.0.0.1:9000/users",
+    const _ = await axios.post(`${URL}/users`,
       postData,
     );
     // // Navigate to the shift confirmation page
