@@ -36,14 +36,10 @@ def get_dates(group_id: str):
     logger.info(f"Receive group_id: {group_id}")
     dates = []
     dates = db.get_dates(group_id)
-    if len(dates) <= 0:
-        return {"message": "error"}
     return {"dates": dates}
 
 @ router.get("/attrs/{group_id}")
 def get_attrs(group_id: str):
     logger.info(f"Receive group_id: {group_id}")
     attrs = db.get_attrs(group_id)
-    if attrs == []:
-        return {"message": "error"}
     return {"attrs": attrs}
