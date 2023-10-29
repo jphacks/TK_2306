@@ -1,0 +1,78 @@
+.container {
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.formsection {
+  margin-bottom: 15px;
+}
+
+.buttonContainer {
+  display: flex;
+  margin-top: 20px;
+}
+
+.createButton {
+  background-color: #ccc;
+  border: none;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-button:hover {
+  background-color: #999;
+}
+
+.inputcontainer {
+  margin-bottom: 20px;
+}
+
+.nameinput {
+  width: 30%;
+  padding: 10px;
+  margin-left: 30px;
+  font-size: 16px;
+}
+
+/* TimeSlotTable.module.css */
+.timeSlotTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #DCDCDC;
+}
+
+.timeSlotTable th, .timeSlotTable td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.candidateTime {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.timeContainer {
+  display: flex;
+  align-items: center;
+}
+
+.time_op {
+  display: flex;
+  justify-content: center;
+}
+
+.timeContainer input {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.timeInput input{
+  margin-right: 10px; /* 入力フィールドの間隔を調整 */
+}
+

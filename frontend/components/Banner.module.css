@@ -1,0 +1,23 @@
+/* BannerWithImages.css */
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: black;
+  background-color: #D9D9D9;
+  padding: 10px;
+  font-family: 'Alfa Slab One', sans-serif;
+  width: 100%;
+}
+
+.banner img {
+  max-width: 100px;
+  height: auto;
+  margin: 0px;
+}
+
+.banner h1 {
+  font-size: 64px;
+  margin: 0px 30px;
+}
