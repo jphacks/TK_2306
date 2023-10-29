@@ -2,11 +2,7 @@ from datetime import datetime
 import math
 import random
 import time
-
-# Parameter の種類
-class Parameter_Type:
-    workers_concentrate = 0 #働いてる人が同じ日に同じ属性が集中
-    workers_scatter = 1
+import type_ as ty
 
 class Schedule:
     def __init__(self,days:int,workers:int,shift:list[list[set[int]]]):
@@ -22,7 +18,7 @@ class Optimize:
                 attributes:list[list[int]], # attributes -> 役職 i　をもつ人のリストが attributes[i] 
                 attribute_requirement:list[list[list[tuple[int,int]]]], # (m,M)=attribute_requirement[48*i+j][k] で i 日目の j 時間目に役職 k がいるべき人数が m 人以上 M 人以下
                 min_time:list[list[int]],  # min_time[i][j] が従事者 i が j 日目に希望する最低労働時間
-                constraints:list[tuple[list[int],Parameter_Type]] # (list,type) = constraints[i] とすると、list[j] がパラメータ i　の 従事者 jにおける値、type はパラメータをどのように制御したいか
+                constraints:list[tuple[list[int],ty.Parameter_Type]] # (list,type) = constraints[i] とすると、list[j] がパラメータ i　の 従事者 jにおける値、type はパラメータをどのように制御したいか
                 ):
         self.days = days
         self.workers = workers
@@ -52,11 +48,10 @@ class Optimize:
         for (a,b) in self.shift_preference[worker][day]:
             if a<=hour<b:
                 return True
-        else:
-            return False
+        return False
         
     def transition(self, sche:Schedule):
-        day = random.randint(0,self.days-1)
+        day = random.randint(0,sche.days-1)
         hour = random.randint(0,47)
         workers = sche.shift[day][hour]
         if not bool(workers):
@@ -104,7 +99,8 @@ class Optimize:
             if flag:
                 enables.append(swap_worker)
 
-        if minimum_attributes == []:
+        enables = enables + enables + enables + enables + enables
+        if minimum_attributes == [] and len(workers) > self.shift_requirement[day][hour][0]:
             enables.append(worker)
 
         if enables == []:
@@ -112,9 +108,10 @@ class Optimize:
         
         swap_worker = random.choice(enables)
         shift=sche.shift.copy()
-        shift[day][hour].remove(worker)
-        if swap_worker != worker:
-            shift[day][hour].add(swap_worker)
+        if len(shift[day][hour]) > self.shift_requirement[day][hour][0]:
+            shift[day][hour].remove(worker)
+        #if swap_worker != worker:
+        shift[day][hour].add(swap_worker)
         return Schedule(self.days,self.workers,shift)
     
 
@@ -138,6 +135,34 @@ class Optimize:
                         score = score + len(common) - len(symmetric_difference)
                     if self.constraints[i][1] == 1:#同じ日に同じ属性を散らしたい
                         score = score - len(common) + len(symmetric_difference)
+        
+        samples = 10
+        continuous_time = 2
+        penalty = 0
+        for _ in range(samples):
+            day = random.randint(0,self.days-1)
+            hour = random.randint(0,47)
+            workers = sche.shift[day][hour]
+            if not bool(workers):
+                continue
+            worker = workers.pop()
+            workers.add(worker)
+            begin,end=hour,hour
+            while begin>0:
+                if worker in sche.shift[day][begin-1]:
+                    begin-=1
+                else:
+                    break
+            while end<46:
+                if worker in sche.shift[day][end+1]:
+                    end+=1
+                else:
+                    break
+            if end-begin+1<continuous_time:
+                penalty += 1
+
+        score -= penalty
+
         return score
     # 焼きなまし法の実装
     def simulated_annealing(self,initial_sche:Schedule, initial_temperature, cooling_rate, max_time):
@@ -152,8 +177,10 @@ class Optimize:
             if elapsed_time > max_time:
                 break
             # 隣接解を生成
-            neighbor_sche= self.transition()
-            neighbor_score = self.eval(neighbor_score)
+            neighbor_sche= self.transition(current_sche)
+            if neighbor_sche.days == 0:
+                continue
+            neighbor_score = self.eval(neighbor_sche)
             # エネルギー差を計算
             score_difference = neighbor_score - current_score
             # 確率で受理するか判定
@@ -168,5 +195,29 @@ class Optimize:
             initial_temperature *= cooling_rate
         return best_sche, best_score
 
-    def solve(self):
-        return
+    def solve(self, parameters, time:int):
+        max_candidate = None
+        max_score = -2**30
+        second_candidate = None
+        second_score = -2**30
+        for candidate in self.candidate:
+            score = self.eval(Schedule(self.days,self.workers,candidate))
+            if score >= max_score:
+                second_score = max_score
+                second_candidate = max_candidate
+                max_score = score
+                max_candidate = candidate
+            if score >= second_score:
+                second_score = score
+                second_candidate = candidate
+
+        fst_time = 2*time/ 3
+        snd_time = time / 3
+        fst_sche, fst_score = self.simulated_annealing(Schedule(self.days,self.workers,max_candidate),parameters[0], parameters[1], fst_time)
+        snd_sche, snd_score = self.simulated_annealing(Schedule(self.days,self.workers,second_candidate), parameters[0], parameters[1], snd_time)
+        res = None
+        if fst_score >= snd_score:
+            res = fst_sche
+        else:
+            res = snd_sche
+        return res

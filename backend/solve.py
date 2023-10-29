@@ -52,10 +52,28 @@ parameters = [1.0, 1.0]
 
 def solve(input_):
     days, workers, attributes, shift_preferences, shift_requirements, workers_attributes, attribute_requirements, min_time, constraints = input_
-    candidate = ini.get_initial_solutions(init_sol_time,days, workers, attributes, shift_preferences, shift_requirements, workers_attributes, attribute_requirements)
+    candidate = ini.get_initial_solutions(init_sol_time, workers, days, attributes, shift_preferences, shift_requirements, workers_attributes, attribute_requirements, debug = False)
     candidate = trans.trans(days, workers, candidate)
     optimizer = opt.Optimize(days, workers, candidate,
                              shift_preferences,shift_requirements,
-                             workers_attributes, min_time, constraints)
+                             workers_attributes, attribute_requirements,
+                             min_time, constraints)
     output = optimizer.solve(parameters, init_sol_time)
-    return output
+    return output.shift
+
+def output(out,days):
+    for day in range(days):
+        print (f"{day+1}日目:")
+        for time in range(48):
+            hour = time//2
+            minuite = time % 2
+            print (f"{hour:02}:{30*minuite:02}-{hour+minuite:02}:{30*(1-minuite):02} :",end='')
+            if not bool(out[day][time]):
+                print(" シフトなし")
+            else:
+                for person in out[day][time]:
+                    print(f" {chr(person + 65)}", end = '')
+                print("")
+
+    return
+
