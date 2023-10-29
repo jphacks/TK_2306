@@ -46,7 +46,7 @@ const TimeSlotTable: React.FC<TimeSlotTableProps> = ({ dates, candidateTimes, re
     control,
     name: `dates.${index}`},
   ); return {fields: fields, append: append, remove: remove};});
-  
+
   return (
     <table className={styles.timeSlotTable}>
       <thead>
