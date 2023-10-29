@@ -5,6 +5,30 @@
 ## 発表スライド
 https://docs.google.com/presentation/d/16T2h_dpMZf4FAdIHDdQWfNyYTskcQmF9Do2RnIK7cfI/edit#slide=id.p
 
+## デモ動画
+
+[UI](https://drive.google.com/file/d/1jyVQ-bBHN3JSkMJgJgQJP9clY6me9iFL/view?usp=sharing)
+
+[google calender空き状況提案](https://drive.google.com/file/d/1xrBp0q6cQC-NGbx05gBbe_cKPCaSYn41/view?usp=sharing)
+
+[google calender シフト日をカレンダーに自動入力](https://drive.google.com/file/d/1vjxze59ez6T8G1KYCVpXRrGZt4rcKOrw/view?usp=sharing)
+
+[最適シフト探索アルゴリズム](https://drive.google.com/file/d/1T5fLHn6TO3YCoZtcWaZOTVozGbdOD4uv/view?usp=sharing)
+
+### 結論
+
+**アイデア出しから実装まで**をすべてHack day当日に行った。
+班員のうち、frontendをやったことがあるのが２人。ReactやNextjsを触ったことがあるのが１人という状況の中で、ネットを調べ試行錯誤を重ねながら作成した。
+
+最後まで完成させきることはできなかったが、以下の機能を実装した。
+ロボットの部品はできているが、組み立てられていない状態である。
+
+* ホームページ上でのページ遷移
+* データベースへのpostとgetに基づいてページの内容を表示
+  * これは一部ページのみ
+* 手入力で与えたシフト希望日のデータに対する最適シフトの導出
+* 手入力で与えたデータシフト結果やシフト候補日に対してのグーグルカレンダー連携
+
 ## 動作方法
 
 * backendディレクトリ、フロントエンドディレクトリにある構成方法に従う
