@@ -121,16 +121,19 @@ const UserPage: React.FC = () => {
     return res;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const postData = {
       group_id: id,
       name: userName,
-      attr: getAttributes(),
-      candidates: getCandidates(),
+      attrs: getAttributes(),
+      dates: getCandidates(),
     };
     console.log("POST Data:", postData);
+    const _ = await axios.post("http://127.0.0.1:9000/users",
+      postData,
+    );
     // // Navigate to the shift confirmation page
-    // router.push(`/${id}/shift`);
+    router.push(`/${id}/shift`);
   };
 
   const handlePreferenceChange = (from_time: string, to_time: string) => {
