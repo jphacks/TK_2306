@@ -5,6 +5,7 @@ import styles from 'styles/index.module.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import TimeSlotTable from './timeslottable';
 import CheckBoxGroup from './checkbox';
+import Banner from "../../components/Banner";
 
 type UserAttribute = {
   name: string;
@@ -87,33 +88,36 @@ const UserPage: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <h1>シフト入力画面</h1>
-      <div className={styles.formsection}>
-        <div className={styles.inputcontainer}>
-          <label>
-            name
-            <input
-              className={styles.nameinput}
-              type="text"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-            />
-          </label>
+    <div>
+      <Banner />
+      <div className={styles.container}>
+        <h1>シフト入力画面</h1>
+        <div className={styles.formsection}>
+          <div className={styles.inputcontainer}>
+            <label>
+              name
+              <input
+                className={styles.nameinput}
+                type="text"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+              />
+            </label>
+          </div>
         </div>
+        <div className={styles.formsection}>
+          <p>属性選択</p>
+          <CheckBoxGroup options={attribute} onChange={handleSelectionChange} />
+        </div>
+        <div>
+        <p>希望日時選択</p>
+          <TimeSlotTable dates={dates} candidateTimes={candidateTimes} onPreferenceChange={handlePreferenceChange} />
       </div>
-      <div className={styles.formsection}>
-        <p>属性選択</p>
-        <CheckBoxGroup options={attribute} onChange={handleSelectionChange} />
-      </div>
-      <div>
-      <p>希望日時選択</p>
-        <TimeSlotTable dates={dates} candidateTimes={candidateTimes} onPreferenceChange={handlePreferenceChange} />
-    </div>
-    <div className={styles.buttonContainer}>
-        <button className={styles.createButton} onClick={handleSubmit}>
-          シフト生成
-        </button>
+      <div className={styles.buttonContainer}>
+          <button className={styles.createButton} onClick={handleSubmit}>
+            シフト生成
+          </button>
+        </div>
       </div>
     </div>
   );

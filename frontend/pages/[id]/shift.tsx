@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Banner from "../../components/Banner";
 
 type ConfirmedShift = {
   date: string;
@@ -25,34 +26,36 @@ const ShiftConfirmationPage: React.FC = () => {
     setUserName('John Doe');
   }, []);
 
-  const handleAddToGoogleCalendar = () => {
-    // Logic to add the confirmed shifts to Google Calendar
+  const handleAddToGoogleCalendar = async () => {
     console.log('Adding to Google Calendar:', confirmedShifts);
   };
 
   return (
     <div>
-      <h1>シフト確認画面</h1>
-      <h2>{userName}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>From</th>
-            <th>To</th>
-          </tr>
-        </thead>
-        <tbody>
-          {confirmedShifts.map((shift, index) => (
-            <tr key={index}>
-              <td>{shift.date}</td>
-              <td>{shift.from}</td>
-              <td>{shift.to}</td>
+      <Banner />
+      <div>
+        <h1>シフト確認画面</h1>
+        <h2>{userName}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>From</th>
+              <th>To</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <button onClick={handleAddToGoogleCalendar}>Google Calendarに登録</button>
+          </thead>
+          <tbody>
+            {confirmedShifts.map((shift, index) => (
+              <tr key={index}>
+                <td>{shift.date}</td>
+                <td>{shift.from}</td>
+                <td>{shift.to}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <button onClick={handleAddToGoogleCalendar}>Google Calendarに登録</button>
+      </div>
     </div>
   );
 };
