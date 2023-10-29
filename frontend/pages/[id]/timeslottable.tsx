@@ -4,7 +4,7 @@ import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import styles from 'styles/index.module.css';
 
 type TimeSlotTableProps = {
-  dates: Date[];
+  dates: string[];
   candidateTimes: string[][];
   onPreferenceChange: (from_time: string, to_time: string) => void;
 };
@@ -30,7 +30,7 @@ const TimeSlotTable: React.FC<TimeSlotTableProps> = ({ dates, candidateTimes, on
       <tbody>
         {dates?.map((date, index) => (
           <tr key={index}>
-            <td>{date.toLocaleDateString()}</td>
+            <td>{date}</td>
             <td>
               {Array.from({ length: candidateTimes[index].length / 2 }, (_, idx) => idx * 2).slice(0, 4)?.map((startIndex) => {
                   const endIndex = startIndex + 1;

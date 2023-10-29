@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 type Option = {
-  label: string;
-  value: string;
+  id: string;
+  name: string;
 };
 
 type CheckBoxGroupProps = {
@@ -26,14 +26,14 @@ const CheckBoxGroup: React.FC<CheckBoxGroupProps> = ({ options, onChange }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       {options?.map((option) => (
-        <label key={option.value} style={{ marginBottom: '10px' }}>
+        <label key={option.name} style={{ marginBottom: '10px' }}>
           <input
             type="checkbox"
-            value={option.value}
-            checked={selectedOptions.includes(option.value)}
+            value={option.name}
+            checked={selectedOptions.includes(option.name)}
             onChange={handleCheckboxChange}
           />
-          {option.label}
+          {option.name}
         </label>
       ))}
     </div>

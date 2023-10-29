@@ -1105,7 +1105,7 @@ const TopPage: React.FC = () => {
     };
 
     const post = async () => {
-      const response = await axios.post("http://localhost:9000",
+      const response = await axios.post("http://127.0.0.1:9000/events",
         postData,
       );
     };
