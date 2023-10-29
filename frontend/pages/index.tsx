@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Button, TextField, Container, Typography, Box, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import PopupContent from './PopupContent';
+import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import {
+  Button,
+  TextField,
+  Container,
+  Typography,
+  Box,
+} from "@mui/material";
+import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
+import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
+import Dialog from "@mui/material/Dialog";
+import PopupContent from "./PopupContent";
 import Banner from '../components/Banner';
+import Theme from '../components/Theme';
 
 type Attribute = {
   name: string;
@@ -26,13 +36,12 @@ type Candidate = {
 };
 
 const TopPage: React.FC = () => {
-  const [calendarStartDate, setCalendarStartDate] = useState<string>('');
-  const [calendarEndDate, setCalendarEndDate] = useState<string>('');
-  const [shiftName, setShiftName] = useState<string>('');
-  const [groupUrl, setGroupUrl] = useState<string>('');
+  const [shiftName, setShiftName] = useState<string>("");
+  const [groupUrl, setGroupUrl] = useState<string>("");
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [openPopup, setOpenPopup] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
 
   const handleCreate = () => {
@@ -46,10 +55,14 @@ const TopPage: React.FC = () => {
       // ... other fields
     };
 
-    console.log('User URL:', generatedUserUrl);
-    console.log('POST Data:', postData);
+    console.log("User URL:", generatedUserUrl);
+    console.log("POST Data:", postData);
   };
 
+  const handleDateChange = (date : any) => {
+    setSelectedDate(date);
+    handlePopupOpen();
+  };
 
   const handlePopupOpen = () => {
     // ... 既存のコード ...
@@ -64,34 +77,19 @@ const TopPage: React.FC = () => {
   };
 
   const addAttribute = () => {
-    setAttributes([...attributes, { name: '', max_people: 0, min_people: 0 }]);
+    setAttributes([...attributes, { name: "", max_people: 0, min_people: 0 }]);
   };
 
   const addPreference = () => {
-    setPreferences([...preferences, { name: '', value: '' }]);
+    setPreferences([...preferences, { name: "", value: "" }]);
   };
 
   return (
     <Container disableGutters maxWidth={false}>
-      <Banner />
+      <Theme>
+        <Banner/>
       <Container maxWidth={false} sx={{ paddingTop : 2, paddingBottom : 5, paddingLeft: 5, paddingRight: 5 }}>
         <Typography variant="h4">シフト管理 - 管理者画面</Typography>
-        <Box>
-          <TextField
-            label="シフト期間の開始日"
-            type="date"
-            value={calendarStartDate}
-            onChange={(e) => setCalendarStartDate(e.target.value)}
-          />
-        </Box>
-        <Box>
-          <TextField
-            label="シフト期間の終了日"
-            type="date"
-            value={calendarEndDate}
-            onChange={(e) => setCalendarEndDate(e.target.value)}
-          />
-        </Box>
         <Box>
           <TextField
             label="シフト表の名前"
@@ -99,6 +97,12 @@ const TopPage: React.FC = () => {
             onChange={(e) => setShiftName(e.target.value)}
           />
         </Box>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateCalendar onChange={handleDateChange} />
+          <Dialog open={openPopup} onClose={handlePopupClose}>
+            <PopupContent onClose={handlePopupClose} />
+          </Dialog>
+        </LocalizationProvider>
 
         <Button variant="contained" color="primary" onClick={addAttribute}>
           Add Attribute
@@ -165,6 +169,33 @@ const TopPage: React.FC = () => {
           </Box>
         ))}
 
+        <Button variant="contained" color="primary" onClick={addPreference}>
+          Add Preference
+        </Button>
+
+        {preferences.map((pref, index) => (
+          <Box key={index}>
+            <TextField
+              label="Preference"
+              value={pref.name}
+              onChange={(e) => {
+                const newPreferences = [...preferences];
+                newPreferences[index].name = e.target.value;
+                setPreferences(newPreferences);
+              }}
+            />
+            <TextField
+              label="Value"
+              value={pref.value}
+              onChange={(e) => {
+                const newPreferences = [...preferences];
+                newPreferences[index].value = e.target.value;
+                setPreferences(newPreferences);
+              }}
+            />
+          </Box>
+        ))}
+
         <Button variant="contained" color="secondary" onClick={handleCreate}>
           作成
         </Button>
@@ -183,6 +214,7 @@ const TopPage: React.FC = () => {
 
         {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
       </Container>
+      </Theme>
     </Container>
   );
 };
