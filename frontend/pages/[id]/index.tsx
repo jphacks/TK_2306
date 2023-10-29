@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import styles from 'styles/index.module.css';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import TimeSlotTable from './timeslottable';
 import CheckBoxGroup from './checkbox';
@@ -16,7 +15,7 @@ type UserPreference = {
 };
 
 type TimeSlotTableProps = {
-  dates: Date[];
+  dates: Date[][];
   candidateTimes: string[];
   onPreferenceChange: (date: Date, time: string) => void;
 };
@@ -34,8 +33,8 @@ const UserPage: React.FC = () => {
 
   const [userName, setUserName] = useState<string>('');
   const [userAttributes, setUserAttributes] = useState<UserAttribute[]>([]);
-  const [selectedAttribute, setSelectedAttribute] = useState([]);
-  const handleSelectionChange = (selectedValues) => {
+  const [selectedAttribute, setSelectedAttribute] = useState<string[]>([]);
+  const handleSelectionChange = (selectedValues: string[]) => {
     setSelectedAttribute(selectedValues);
   };
   const [userPreferences, setUserPreferences] = useState<UserPreference[]>([]);
@@ -82,7 +81,7 @@ const UserPage: React.FC = () => {
     router.push(`/${id}/shift`);
   };
 
-  const handlePreferenceChange = (date: Date, time: string) => {
+  const handlePreferenceChange = (from_time: string, to_time: string) => {
     // ユーザーの希望時間が変更されたときの処理
     // ...
   };
