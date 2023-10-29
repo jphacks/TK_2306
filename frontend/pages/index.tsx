@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Button, TextField, Container, Typography, Box } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Container,
+  Typography,
+  Box,
+  Grid,
+} from "@mui/material";
 import {
   DateCalendar,
   LocalizationProvider,
@@ -16,7 +23,7 @@ import DialogActions from "@mui/material/DialogActions"; // DialogActionsをイ�
 import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { useRouter } from "next/router";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 type Attribute = {
   name: string;
@@ -51,6 +58,8 @@ type Temp = {
   end: string;
   max: number;
   min: number;
+  attr: Attribute[];
+  pref: Preference[];
 };
 
 const TopPage: React.FC = () => {
@@ -58,6 +67,8 @@ const TopPage: React.FC = () => {
   const [groupUrl, setGroupUrl] = useState<string>("");
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [preferences, setPreferences] = useState<Preference[]>([]);
+  const [customAttributes, setCustomAttributes] = useState<Attribute[]>([]);
+  const [customPreferences, setCustomPreferences] = useState<Preference[]>([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedStart, setSelectedStart] = useState<string>("");
@@ -79,8 +90,8 @@ const TopPage: React.FC = () => {
         time_to: t.end,
         max_people: t.max,
         min_people: t.min,
-        attrs: attributes,
-        preferences: preferences,
+        attrs: t.attr,
+        preferences: t.pref,
       };
     });
 
@@ -91,8 +102,9 @@ const TopPage: React.FC = () => {
     };
 
     const post = async () => {
-      const response = await axios.post("http://127.0.0.1:9000/events",
-        postData,
+      const response = await axios.post(
+        "http://127.0.0.1:9000/events",
+        postData
       );
     };
 
@@ -122,9 +134,19 @@ const TopPage: React.FC = () => {
         end: selectedEnd,
         max: selectedMax,
         min: selectedMin,
+        attr: [...customAttributes, ...attributes],
+        pref: [...customPreferences, ...preferences],
       },
     ]);
     setOpenPopup(false);
+  };
+
+  const addCustomAttribute = () => {
+    setCustomAttributes([...customAttributes, { name: "", max_people: 0, min_people: 0 }]);
+  };
+
+  const addCustomPreference = () => {
+    setCustomPreferences([...customPreferences, { target: "", value: "" }]);
   };
 
   const addAttribute = () => {
@@ -150,9 +172,110 @@ const TopPage: React.FC = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateCalendar onChange={handleDateChange} />
           <Dialog open={openPopup} onClose={handlePopupClose} maxWidth="md">
-            <DialogTitle>{dayjs(selectedDate).format('ddd, DD MMM YYYY')}</DialogTitle>
+            <DialogTitle>
+              {dayjs(selectedDate).format("ddd, DD MMM YYYY")}
+            </DialogTitle>
             <DialogContent>
-              
+              <DialogContent>
+                <TextField
+                  label="開始時間"
+                  value={selectedStart}
+                  onChange={(e) => setSelectedStart(e.target.value)}
+                />
+                <br />
+                <TextField
+                  label="終了時間"
+                  value={selectedEnd}
+                  onChange={(e) => setSelectedEnd(e.target.value)}
+                />
+                <br />
+                <TextField
+                  label="最小人数"
+                  value={selectedMin}
+                  onChange={(e) => setSelectedMin(Number(e.target.value))}
+                />
+                <TextField
+                  label="最大人数"
+                  value={selectedMax}
+                  onChange={(e) => setSelectedMax(Number(e.target.value))}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={addCustomAttribute}
+                >
+                  Add Attribute
+                </Button>
+                {customAttributes.map((attr, index) => (
+                  <Box key={index}>
+                    <TextField
+                      label="name"
+                      value={attr.name}
+                      onChange={(e) => {
+                        const newCustomAttributes = [...customAttributes];
+                        newCustomAttributes[index].name = e.target.value;
+                        setCustomAttributes(newCustomAttributes);
+                      }}
+                    />
+                    <TextField
+                      label="Min"
+                      value={attr.min_people}
+                      onChange={(e) => {
+                        const newCustomAttributes = [...customAttributes];
+                        newCustomAttributes[index].min_people = Number(
+                          e.target.value
+                        );
+                        setCustomAttributes(newCustomAttributes);
+                      }}
+                    />
+                    <TextField
+                      label="Max"
+                      value={attr.max_people}
+                      onChange={(e) => {
+                        const newCustomAttributes = [...customAttributes];
+                        newCustomAttributes[index].max_people = Number(
+                          e.target.value
+                        );
+                        setCustomAttributes(newCustomAttributes);
+                      }}
+                    />
+                  </Box>
+                ))}
+              </DialogActions>
+              <DialogActions>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={addCustomPreference}
+                >
+                  Add Preference
+                </Button>
+
+                {customPreferences.map((pref, index) => (
+                  <Box key={index}>
+                    <TextField
+                      label="Preference"
+                      value={pref.target}
+                      onChange={(e) => {
+                        const newCustomPreferences = [...customPreferences];
+                        newCustomPreferences[index].target = e.target.value;
+                        setCustomPreferences(newCustomPreferences);
+                      }}
+                    />
+                    <TextField
+                      label="Value"
+                      value={pref.value}
+                      onChange={(e) => {
+                        const newCustomPreferences = [...customPreferences];
+                        newCustomPreferences[index].value = e.target.value;
+                        setCustomPreferences(newCustomPreferences);
+                      }}
+                    />
+                  </Box>
+                ))}
+              </DialogActions>
             </DialogContent>
             <DialogActions>
               <Button
@@ -186,16 +309,16 @@ const TopPage: React.FC = () => {
               value={attr.min_people}
               onChange={(e) => {
                 const newAttributes = [...attributes];
-                newAttributes[index].min_people = Number(e.target.value);
+                newAttributes[index].max_people = Number(e.target.value);
                 setAttributes(newAttributes);
               }}
             />
             <TextField
               label="Max"
-              value={attr.min_people}
+              value={attr.max_people}
               onChange={(e) => {
                 const newAttributes = [...attributes];
-                newAttributes[index].min_people = Number(e.target.value);
+                newAttributes[index].max_people = Number(e.target.value);
                 setAttributes(newAttributes);
               }}
             />
