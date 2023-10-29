@@ -128,8 +128,10 @@ class AdminRepository:
             cur = con.cursor()
             cur.execute(
                 """INSERT INTO event_dates (group_id, date, time_from, time_to, max_people, min_people)
-                   VALUES(?,?,?,?,?,?) RETURNING id;""",
+                   VALUES(?,?,?,?,?,?)""",
                 (group_id, date, time_from, time_to, max_people, min_people,))
+            
+            res = cur.lastrowid
             res = cur.fetchall()[0][0]
             logger.debug(f"{res}")
             con.commit()
@@ -150,9 +152,9 @@ class AdminRepository:
             cur = con.cursor()
             cur.execute(
                 """INSERT INTO event_attributes (date_id, name, max_people, min_people)
-                   VALUES(?,?,?,?) RETURNING id;""",
+                   VALUES(?,?,?,?)""",
                 (date_id, attr_name, max_people, min_people,))
-            res = cur.fetchall()[0][0]
+            res = cur.lastrowid
             con.commit()
             con.close()
             return res
