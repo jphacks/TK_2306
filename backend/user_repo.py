@@ -64,3 +64,42 @@ class UserRepository:
         except sqlite3.Error as err:
             logger.debug(err)
             return False
+    
+    def get_user_ids(self, group_id: str) -> list[(int)]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT id from users where group_id = ?""", (group_id,))
+            res = cur.fetchall()
+            con.close()
+            return res
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return None
+    
+    def get_user_attrs(self, group_id: str) -> list[tuple[int, int, bool]]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT user_id, attr_id, value from user_attributes where user_id in (select user_id from users where group_id = ?)""", (group_id,))
+            res = cur.fetchall()
+            con.close()
+            return res
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return None
+    
+    def get_user_dates(self, group_id: str) -> list[tuple[int, str, str, str]]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT user_id, date, time_from, time_to from user_dates where user_id in (select id from users where group_id = ?)""", (group_id,))
+            res = cur.fetchall()
+            con.close()
+            return res
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return None
