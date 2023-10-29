@@ -2,26 +2,26 @@ from datetime import datetime
 import math
 import random
 
-# Parameter の
-class Parameter_Type():
+# Parameter の種類
+class Parameter_Type:
     workers_concentrate = 0 #働いてる人が同じ日に同じ属性が集中
     workers_scatter = 1
 
 class Schedule:
-    def __init__(self,days:int,workers:int,shift:list[list[list[int]]]):
+    def __init__(self,days:int,workers:int,shift:list[list[set[int]]]):
         self.days = days
         self.workers = workers
         self.shift = shift
 
 class Optimize:
     def __init__(self,days:int,workers:int, #days -> 日数 workers -> 従事者の人数
-                candidate:list[list[list[list[int]]]], # candidate -> 解の候補
-                shift_preference:list[list[list[tuple[int,int]]]], #各人のシフト希望
-                shift_requirement:list[list[tuple[int,int]]], # 各時間のシフトの最小人数と最大人数
-                attributes:list[list[int]], # attributes -> attributes[i] で役職iの一覧
-                attribute_requirement:list[list[tuple[int,int]]], # attributes_requirement -> 役職の要求
-                min_time:list[list[int]],  # 各日における各従事者の最低労働時間
-                constraints:list[tuple[list[int],Parameter_Type]] #constraints[i] 
+                candidate:list[list[list[set[int]]]], # candidate -> 解の候補のリスト、candidate[i][j][k] -> i番目の解の候補において、j日目のk時間目に働いている従事者のリスト
+                shift_preference:list[list[list[tuple[int,int]]]], # 各人のシフト希望、 shift_preference[i][j] -> 従事者 i の j日目の希望するシフトのリスト、各タプルは半開区間を意図しており、(a,b)はa時からb時前まで
+                shift_requirement:list[list[tuple[int,int]]], # (m,M)=shift_requirement[i][j] -> i 日目の j 時間目は m 人以上M人以下必要
+                attributes:list[list[int]], # attributes -> 役職 i　をもつ人のリストが attributes[i] 
+                attribute_requirement:list[list[list[tuple[int,int]]]], # (m,M)=attribute_requirement[48*i+j][k] で i 日目の j 時間目に役職 k がいるべき人数が m 人以上 M 人以下
+                min_time:list[list[int]],  # min_time[i][j] が従事者 i が j 日目に希望する最低労働時間
+                constraints:list[tuple[list[int],Parameter_Type]] # (list,type) = constraints[i] とすると、list[j] がパラメータ i　の 従事者 jにおける値、type はパラメータをどのように制御したいか
                 ):
         self.days = days
         self.workers = workers
@@ -54,13 +54,13 @@ class Optimize:
         else:
             return False
         
-    def transition(self, sche):
+    def transition(self, sche:Schedule):
         day = random.randint(0,self.days-1)
         hour = random.randint(0,47)
         workers = sche.shift[day][hour]
-        if workers == []:
+        if not bool(workers):
             return Schedule(0,0,[[[]]])
-        worker = random.choice(workers)
+        worker = random.choice(list(workers))
         # 勤務時間の端を探す。日をまたぐケースを想定していないので後で実装すること！
         begin,end=hour,hour
         while begin>0:
@@ -86,7 +86,7 @@ class Optimize:
         for post in range(len(self.attributes)):
             if not (worker in self.attributes[post]):
                 continue
-            (m,_)=self.attribute_requirement[day*48+hour][worker]
+            (m,_)=self.attribute_requirement[day][hour][worker]
             if m==self.schedule_attribute(day,hour,post,sche):
                 minimum_attributes.append(post)
         
@@ -113,7 +113,7 @@ class Optimize:
         shift=sche.shift.copy()
         shift[day][hour].remove(worker)
         if swap_worker != worker:
-            shift[day][hour].append(swap_worker)
+            shift[day][hour].add(swap_worker)
         return Schedule(self.days,self.workers,shift)
     
 
@@ -123,14 +123,14 @@ class Optimize:
         for i in range (num_constraints):
             for j in range (sche.days):
                 for k in range(48):
-                    set1 = set(sche.shift[j][k])
+                    set1 = sche.shift[j][k]
                     set2 = set(self.constraints[i][0])
                     # 現在のシフトに存在する要素を抽出
                     # difference1 = list(set1 - set2)
                     # 制約にだけ存在する要素を抽出
                     # difference2 = list(set2 - set1)
                     # どちらかのリストにだけ存在する要素を抽出
-                    symmetric_difference = list(set1.symmetric_difference(set2))
+                    symmetric_difference = set1.symmetric_difference(set2)
                     #両方に存在するリストを抽出
                     common = list(set1.intersection(set2))
                     if self.constraints[i][1] == 0:#同じ日に同じ属性を集中させたい
@@ -144,7 +144,7 @@ class Optimize:
         current_score = self.eval(current_sche)
         best_sche = current_sche
         best_score = current_score
-        for i in range(num_iterations):
+        for _ in range(num_iterations):
             # 隣接解を生成
             neighbor_sche= self.transition()
             neighbor_score = self.eval(neighbor_score)
@@ -161,3 +161,6 @@ class Optimize:
             # 温度を冷却
             initial_temperature *= cooling_rate
         return best_sche, best_score
+
+    def solve(self):
+        return
