@@ -60,3 +60,20 @@ def solve(input_):
                              min_time, constraints)
     output = optimizer.solve(parameters, init_sol_time)
     return output.shift
+
+def output(out,days):
+    for day in range(days):
+        print (f"{day+1}日目:")
+        for time in range(48):
+            hour = time//2
+            minuite = time % 2
+            print (f"{hour:02}:{30*minuite:02}-{hour+minuite:02}:{30*(1-minuite):02} :",end='')
+            if not bool(out[day][time]):
+                print(" シフトなし")
+            else:
+                for person in out[day][time]:
+                    print(f" {chr(person + 65)}", end = '')
+                print("")
+
+    return
+
