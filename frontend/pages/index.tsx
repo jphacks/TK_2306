@@ -1,26 +1,15 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import {
-  Button,
-  TextField,
-  Container,
-  Typography,
-  Box,
-  Grid,
-} from "@mui/material";
-import {
-  DateCalendar,
-  LocalizationProvider,
-  dateCalendarClasses,
-} from "@mui/x-date-pickers-pro";
+import { Button, TextField, Container, Typography, Box } from "@mui/material";
+import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import Dialog from "@mui/material/Dialog";
 import Banner from "../components/Banner";
 import Theme from "../components/Theme";
 import DialogTitle from "@mui/material/DialogTitle"; // DialogTitleをインポート
 import DialogContent from "@mui/material/DialogContent"; // DialogContentをインポート
+import DialogContentText from "@mui/material/DialogContentText"; // DialogContentTextをインポート
 import DialogActions from "@mui/material/DialogActions"; // DialogActionsをインポート
-import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
@@ -138,11 +127,20 @@ const TopPage: React.FC = () => {
         pref: [...customPreferences, ...preferences],
       },
     ]);
+    setSelectedStart("");
+    setSelectedEnd("");
+    setSelectedMax(0);
+    setSelectedMin(0);
+    setCustomAttributes([]);
+    setCustomPreferences([]);
     setOpenPopup(false);
   };
 
   const addCustomAttribute = () => {
-    setCustomAttributes([...customAttributes, { name: "", max_people: 0, min_people: 0 }]);
+    setCustomAttributes([
+      ...customAttributes,
+      { name: "", max_people: 0, min_people: 0 },
+    ]);
   };
 
   const addCustomPreference = () => {
@@ -171,47 +169,62 @@ const TopPage: React.FC = () => {
         </Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateCalendar onChange={handleDateChange} />
-          <Dialog open={openPopup} onClose={handlePopupClose} maxWidth="md">
+          <Dialog
+            open={openPopup}
+            onClose={handlePopupClose}
+            maxWidth="md"
+            style={{ overflow: "auto" }}
+          >
             <DialogTitle>
               {dayjs(selectedDate).format("ddd, DD MMM YYYY")}
             </DialogTitle>
             <DialogContent>
+              <DialogContentText id="description of the dialog">
+                Please enter the start time, end time, minimum number of people,
+                <br /> and maximum number of people for the shift.
+              </DialogContentText>
               <DialogContent>
                 <TextField
-                  label="開始時間"
+                  label="start time"
                   value={selectedStart}
                   onChange={(e) => setSelectedStart(e.target.value)}
                 />
                 <br />
                 <TextField
-                  label="終了時間"
+                  label="end time"
                   value={selectedEnd}
                   onChange={(e) => setSelectedEnd(e.target.value)}
                 />
                 <br />
                 <TextField
-                  label="最小人数"
+                  label="min"
                   value={selectedMin}
                   onChange={(e) => setSelectedMin(Number(e.target.value))}
                 />
                 <TextField
-                  label="最大人数"
+                  label="max"
                   value={selectedMax}
                   onChange={(e) => setSelectedMax(Number(e.target.value))}
                 />
               </DialogContent>
-              <DialogActions>
+              <DialogContentText id="description of the attribute">
+                You can set the minimum and maximum number of people for each
+                attribute.
+                <br /> This requirement is always met.
+              </DialogContentText>
+              <DialogActions style={{ flexDirection: "column" }}>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={addCustomAttribute}
+                  style={{ marginBottom: "16px" }}
                 >
                   Add Attribute
                 </Button>
                 {customAttributes.map((attr, index) => (
                   <Box key={index}>
                     <TextField
-                      label="name"
+                      label="Attribute"
                       value={attr.name}
                       onChange={(e) => {
                         const newCustomAttributes = [...customAttributes];
@@ -244,11 +257,16 @@ const TopPage: React.FC = () => {
                   </Box>
                 ))}
               </DialogActions>
-              <DialogActions>
+              <DialogContentText id="description of the dialog">
+                You can set some constraints for each preferences.
+                <br /> This requirement is met as much as possible.
+              </DialogContentText>
+              <DialogActions style={{ flexDirection: "column" }}>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={addCustomPreference}
+                  style={{ marginBottom: "16px" }}
                 >
                   Add Preference
                 </Button>
@@ -355,12 +373,6 @@ const TopPage: React.FC = () => {
         <Button variant="contained" color="secondary" onClick={handleCreate}>
           作成
         </Button>
-
-        {/* <Button variant="contained" color="primary" onClick={handlePopupOpen}>
-            Open Popup
-          </Button> */}
-
-        {/* {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>} */}
       </Theme>
     </Container>
   );
