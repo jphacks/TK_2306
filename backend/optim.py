@@ -1,6 +1,7 @@
 from datetime import datetime
 import math
 import random
+import time
 
 # Parameter の種類
 class Parameter_Type:
@@ -134,17 +135,22 @@ class Optimize:
                     #両方に存在するリストを抽出
                     common = list(set1.intersection(set2))
                     if self.constraints[i][1] == 0:#同じ日に同じ属性を集中させたい
-                        score = score + len(common) - len(symmetric_difference)/2
+                        score = score + len(common) - len(symmetric_difference)
                     if self.constraints[i][1] == 1:#同じ日に同じ属性を散らしたい
-                        score = score - len(common) + len(symmetric_difference)/2
+                        score = score - len(common) + len(symmetric_difference)
         return score
     # 焼きなまし法の実装
-    def simulated_annealing(self,initial_sche:Schedule, initial_temperature, cooling_rate, num_iterations):
+    def simulated_annealing(self,initial_sche:Schedule, initial_temperature, cooling_rate, max_time):
         current_sche = initial_sche
         current_score = self.eval(current_sche)
         best_sche = current_sche
         best_score = current_score
-        for _ in range(num_iterations):
+        
+        start_time = time.perf_counter() #開始時間
+        while True:
+            elapsed_time = time.perf_counter() - start_time#マイクロ秒単位
+            if elapsed_time > max_time:
+                break
             # 隣接解を生成
             neighbor_sche= self.transition()
             neighbor_score = self.eval(neighbor_score)
