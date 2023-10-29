@@ -2,6 +2,11 @@
 
 [![IMAGE ALT TEXT HERE](https://jphacks.com/wp-content/uploads/2023/07/JPHACKS2023_ogp.png)](https://www.youtube.com/watch?v=yYRQEdfGjEg)
 
+
+## 動作方法
+
+* backendディレクトリ、フロントエンドディレクトリにある構成方法に従う
+
 ## 製品概要
 
 ### 背景(製品開発のきっかけ、課題等）
