@@ -52,10 +52,11 @@ parameters = [1.0, 1.0]
 
 def solve(input_):
     days, workers, attributes, shift_preferences, shift_requirements, workers_attributes, attribute_requirements, min_time, constraints = input_
-    candidate = ini.get_initial_solutions(init_sol_time,days, workers, attributes, shift_preferences, shift_requirements, workers_attributes, attribute_requirements)
+    candidate = ini.get_initial_solutions(init_sol_time, workers, days, attributes, shift_preferences, shift_requirements, workers_attributes, attribute_requirements, debug = False)
     candidate = trans.trans(days, workers, candidate)
     optimizer = opt.Optimize(days, workers, candidate,
                              shift_preferences,shift_requirements,
-                             workers_attributes, min_time, constraints)
+                             workers_attributes, attribute_requirements,
+                             min_time, constraints)
     output = optimizer.solve(parameters, init_sol_time)
-    return output
+    return output.shift

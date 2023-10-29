@@ -48,8 +48,7 @@ class Optimize:
         for (a,b) in self.shift_preference[worker][day]:
             if a<=hour<b:
                 return True
-        else:
-            return False
+        return False
         
     def transition(self, sche:Schedule):
         day = random.randint(0,sche.days-1)
@@ -100,7 +99,8 @@ class Optimize:
             if flag:
                 enables.append(swap_worker)
 
-        if minimum_attributes == []:
+        enables = enables + enables + enables + enables + enables
+        if minimum_attributes == [] and len(workers) > self.shift_requirement[day][hour][0]:
             enables.append(worker)
 
         if enables == []:
@@ -108,9 +108,10 @@ class Optimize:
         
         swap_worker = random.choice(enables)
         shift=sche.shift.copy()
-        shift[day][hour].remove(worker)
-        if swap_worker != worker:
-            shift[day][hour].add(swap_worker)
+        if len(shift[day][hour]) > self.shift_requirement[day][hour][0]:
+            shift[day][hour].remove(worker)
+        #if swap_worker != worker:
+        shift[day][hour].add(swap_worker)
         return Schedule(self.days,self.workers,shift)
     
 
