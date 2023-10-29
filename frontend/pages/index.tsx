@@ -6,9 +6,6 @@ import {
   Container,
   Typography,
   Box,
-  Grid,
-  ThemeProvider,
-  createTheme,
 } from "@mui/material";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
@@ -86,14 +83,6 @@ const TopPage: React.FC = () => {
   const addPreference = () => {
     setPreferences([...preferences, { name: "", value: "" }]);
   };
-
-  // const theme = createTheme({
-  //   palette: {
-  //     primary: {
-  //       main: "#D9D9D9",
-  //     },
-  //   },
-  // });
 
   return (
     <Container>
