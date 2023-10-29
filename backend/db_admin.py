@@ -1,55 +1,49 @@
 import logging
 import sqlite3
-from abc import ABCMeta, abstractmethod
 
-from pydantic.types import OptionalInt
+from typing import Optional
+from pydantic import BaseModel  # リクエストbodyを定義するために必要
 
 logger = logging.getLogger("uvicorn")
 logger.level = logging.DEBUG
 
-db_path = "../db/db.sqlite3"
+db_path = "../db/db.sqlite"
 
+class Attr(BaseModel):
+    name: str
+    max_people: int
+    min_people: int
 
+class Preference(BaseModel):
+    target: str
+    value: str
 
+class DateDetails(BaseModel):
+    date: str
+    time_from: str
+    time_to: str
+    max_people: int
+    min_people: int
+    attrs: list[Attr]
+    preferences: list[Preference]
 
-class EventsRepository(metaclass=ABCMeta):
-    @abstractmethod
-    def get_id_by_name(self, name) -> OptionalInt:
-        pass
+class Date(BaseModel):
+    date: str
+    time_from: str
+    time_to: str
 
-    @abstractmethod
-    def add_events(self, id, name) -> OptionalInt:
-        pass
+class Event(BaseModel):
+    name: str
+    group_id: str
+    dates: list[DateDetails]
 
-
-class EventDatesRepository(metaclass=ABCMeta):
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def get_items(self) -> dict:
-        pass
-
-    @abstractmethod
-    def get_item_by_id(self, id) -> dict:
-        pass
-
-    @abstractmethod
-    def add_items(self, name, category, filename) -> dict:
-        pass
-
-    @abstractmethod
-    def search_items_by_name(self, name) -> dict:
-        pass
-
-
-class SqliteEventsRepository(EventsRepository):
-    def get_id_by_name(self, name) -> OptionalInt:
+class AdminRepository:
+    def get_group_id_by_name(self, name) -> Optional[int]:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """SELECT id from categories where name = ?""", (name,))
+                """SELECT group_id from events where name = ?""", (name,))
             res = cur.fetchall()
             con.close()
             if len(res) > 0:
@@ -59,13 +53,13 @@ class SqliteEventsRepository(EventsRepository):
         except sqlite3.Error as err:
             logger.debug(err)
             return None
-
-    def add_event(self, id, name) -> OptionalInt:
+        
+    def add_event(self, id, name):
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO categories (id, name) VALUES(?, ?)""", (id, name,))
+                """INSERT INTO events (group_id, name) VALUES(?, ?)""", (id, name,))
             res = id
             con.commit()
             con.close()
@@ -74,84 +68,305 @@ class SqliteEventsRepository(EventsRepository):
         except sqlite3.Error as err:
             logger.debug(err)
             return None
-
-
-class SqliteEventDatesRepository(EventDatesRepository):
-    def __init__(self):
-        pass
-
-    def __convert_date_list_to_dict(self, list):
-        res = {"dates": []}
-        for (date, time_from, time_to, min_people, max_people, attr) in list:
-            res["dates"].append(
-                {"date"      : date, 
-                 "from"      : time_from, 
-                 "to"        : time_to,
-                 "min_people": min_people, 
-                 "max_people": max_people, 
-                 "attr"      : attr})
-        return res
-
-    def get_items(self) -> dict:
+        
+    def get_dates(self, group_id) -> list[Date]:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """SELECT items.id, categories.name, items.name, items.image_name FROM items
-                JOIN categories ON items.category_id = categories.id;""")
-            res = self.__convert_item_list_to_dict(cur.fetchall())
+                """SELECT date, time_from, time_to, max_people, min_people from event_dates where group_id = ?""", (group_id,))
+            res = cur.fetchall()
             con.close()
-            return res
+            dates = []
+            for i in range(len(res)):
+                res_date, res_time_from, res_time_to, _, _ = res[i]
+                date = Date(date=res_date, time_from=res_time_from, time_to=res_time_to)
+                dates.append(date)
+            return dates
         except sqlite3.Error as err:
             logger.debug(err)
-            return {}
-
-    def get_item_by_id(self, id) -> dict:
+            return []
+        
+    def add_date(self, group_id, date, time_from, time_to, max_people, min_people):
         try:
-            con = sqlite3.connect(db_path)
-            cur = con.cursor()
-            cur.execute(
-                """SELECT items.id, categories.name, items.name, items.image_name FROM items
-                    JOIN categories ON items.category_id = categories.id WHERE items.id = ?;""", id)
-            res = self.__convert_item_list_to_dict(cur.fetchall())
-            con.close()
-            return res
-        except sqlite3.Error as err:
-            logger.debug(err)
-            return {}
-
-    def add_event_date(self, event_name, date, time_from, time_to, max_people, min_people):
-        try:
-            events_repo = SqliteEventDatesRepository()
-            group_id = events_repo.get_id_by_name(event_name)
+            # group_id = self.get_group_id_by_name(event_name)
             if not group_id:
                 logger.debug("err")
                 return {}
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO event_dates (group_id, date, time_from, time_to, max_poeple, min_people)
-                   VALUES(?,?,?,?,?,?) RETERNING id;""",
-                (group_id, date, time_from, time_to, max_people, min_people))
+                """INSERT INTO event_dates (group_id, date, time_from, time_to, max_people, min_people)
+                   VALUES(?,?,?,?,?,?)""",
+                (group_id, date, time_from, time_to, max_people, min_people,))
+            
+            res = cur.lastrowid
             res = cur.fetchall()[0][0]
+            logger.debug(f"{res}")
             con.commit()
             con.close()
             return res
         except sqlite3.Error as err:
             logger.debug(err)
             return {}
-
-    def search_items_by_name(self, keyword):
+        
+    def add_attribute(self, date_id, attr_name, max_people, min_people):
         try:
+            # group_id = self.get_group_id_by_name(event_name)
+            # if not group_id:
+            #     logger.debug("err")
+            #     return {}
+            # date_id = self.get_date_id_by_group_id(group_id)
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """SELECT items.id, categories.name, items.name, items.image_name FROM items
-                    JOIN categories ON items.category_id = categories.id
-                    WHERE items.name LIKE ?""", (f'%{keyword}%',))
-            res = self.__convert_item_list_to_dict(cur.fetchall())
+                """INSERT INTO event_attributes (date_id, name, max_people, min_people)
+                   VALUES(?,?,?,?)""",
+                (date_id, attr_name, max_people, min_people,))
+            res = cur.lastrowid
+            con.commit()
             con.close()
             return res
         except sqlite3.Error as err:
             logger.debug(err)
             return {}
+        
+    def get_attrs(self, group_id) -> list[dict]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT id from event_dates where group_id = ?""", (group_id,))
+            date_ids = cur.fetchall()
+            con.close()
+
+            attrs = []
+
+            for i in range(len(date_ids)):
+                date_id, = date_ids[i]
+                con = sqlite3.connect(db_path)
+                cur = con.cursor()
+                cur.execute(
+                    """SELECT id, name from event_attributes where date_id = ?""", (date_id,))
+                res = cur.fetchall()
+                con.close()
+                for j in range(len(res)):
+                    res_attr_id, res_sttr_name = res[j]
+                    attrs.append({"id": res_attr_id, "name": res_sttr_name})
+            # logger.debug(f"{attrs}")
+            return attrs
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return []
+
+
+# class SqliteEventsRepository:
+#     def get_id_by_name(self, name) -> OptionalInt:
+#         try:
+#             con = sqlite3.connect(db_path)
+#             cur = con.cursor()
+#             cur.execute(
+#                 """SELECT id from events where name = ?""", (name,))
+#             res = cur.fetchall()
+#             con.close()
+#             if len(res) > 0:
+#                 return res[0][0]
+#             else:
+#                 return None
+#         except sqlite3.Error as err:
+#             logger.debug(err)
+#             return None
+
+#     def add_event(self, id, name) -> OptionalInt:
+#         try:
+#             con = sqlite3.connect(db_path)
+#             cur = con.cursor()
+#             cur.execute(
+#                 """INSERT INTO categories (id, name) VALUES(?, ?)""", (id, name,))
+#             res = id
+#             con.commit()
+#             con.close()
+#             return res
+
+#         except sqlite3.Error as err:
+#             logger.debug(err)
+#             return None
+
+
+# class SqliteEventDatesRepository:
+#     def __init__(self):
+#         pass
+
+#     # def __convert_date_list_to_dict(self, list):
+#     #     res = {"dates": []}
+#     #     for (date, time_from, time_to, min_people, max_people, attr) in list:
+#     #         res["dates"].append(
+#     #             {"date"      : date, 
+#     #              "from"      : time_from, 
+#     #              "to"        : time_to,
+#     #              "min_people": min_people, 
+#     #              "max_people": max_people, 
+#     #              "attr"      : attr})
+#     #     return res
+
+#     # def get_items(self) -> dict:
+#     #     try:
+#     #         con = sqlite3.connect(db_path)
+#     #         cur = con.cursor()
+#     #         cur.execute(
+#     #             """SELECT items.id, categories.name, items.name, items.image_name FROM items
+#     #             JOIN categories ON items.category_id = categories.id;""")
+#     #         res = self.__convert_item_list_to_dict(cur.fetchall())
+#     #         con.close()
+#     #         return res
+#     #     except sqlite3.Error as err:
+#     #         logger.debug(err)
+#     #         return {}
+
+#     # def get_item_by_id(self, id) -> dict:
+#     #     try:
+#     #         con = sqlite3.connect(db_path)
+#     #         cur = con.cursor()
+#     #         cur.execute(
+#     #             """SELECT items.id, categories.name, items.name, items.image_name FROM items
+#     #                 JOIN categories ON items.category_id = categories.id WHERE items.id = ?;""", id)
+#     #         res = self.__convert_item_list_to_dict(cur.fetchall())
+#     #         con.close()
+#     #         return res
+#     #     except sqlite3.Error as err:
+#     #         logger.debug(err)
+#     #         return {}
+        
+#     def get_date_id_by_group_id(self, group_id) -> OptionalInt:
+#         try:
+#             con = sqlite3.connect(db_path)
+#             cur = con.cursor()
+#             cur.execute(
+#                 """SELECT id from event_dates where group_id = ?""", (group_id,))
+#             res = cur.fetchall()
+#             con.close()
+#             if len(res) > 0:
+#                 return res[0][0]
+#             else:
+#                 return None
+#         except sqlite3.Error as err:
+#             logger.debug(err)
+#             return None
+
+#     def add_date(self, event_name, date, time_from, time_to, max_people, min_people):
+#         try:
+#             events_repo = SqliteEventDatesRepository()
+#             group_id = events_repo.get_id_by_name(event_name)
+#             if not group_id:
+#                 logger.debug("err")
+#                 return {}
+#             con = sqlite3.connect(db_path)
+#             cur = con.cursor()
+#             cur.execute(
+#                 """INSERT INTO event_dates (group_id, date, time_from, time_to, max_poeple, min_people)
+#                    VALUES(?,?,?,?,?,?) RETURNING id;""",
+#                 (group_id, date, time_from, time_to, max_people, min_people))
+#             res = cur.fetchall()[0][0]
+#             con.commit()
+#             con.close()
+#             return res
+#         except sqlite3.Error as err:
+#             logger.debug(err)
+#             return {}
+
+#     # def search_items_by_name(self, keyword):
+#     #     try:
+#     #         con = sqlite3.connect(db_path)
+#     #         cur = con.cursor()
+#     #         cur.execute(
+#     #             """SELECT items.id, categories.name, items.name, items.image_name FROM items
+#     #                 JOIN categories ON items.category_id = categories.id
+#     #                 WHERE items.name LIKE ?""", (f'%{keyword}%',))
+#     #         res = self.__convert_item_list_to_dict(cur.fetchall())
+#     #         con.close()
+#     #         return res
+#     #     except sqlite3.Error as err:
+#     #         logger.debug(err)
+#     #         return {}
+
+# class SqliteEventAttributesRepository:
+#     def __init__(self):
+#         pass
+
+#     # def __convert__list_to_dict(self, list):
+#     #     res = {"dates": []}
+#     #     for (date, time_from, time_to, min_people, max_people, attr) in list:
+#     #         res["dates"].append(
+#     #             {"date"      : date, 
+#     #              "from"      : time_from, 
+#     #              "to"        : time_to,
+#     #              "min_people": min_people, 
+#     #              "max_people": max_people, 
+#     #              "attr"      : attr})
+#     #     return res
+
+#     # def get_items(self) -> dict:
+#     #     try:
+#     #         con = sqlite3.connect(db_path)
+#     #         cur = con.cursor()
+#     #         cur.execute(
+#     #             """SELECT items.id, categories.name, items.name, items.image_name FROM items
+#     #             JOIN categories ON items.category_id = categories.id;""")
+#     #         res = self.__convert_item_list_to_dict(cur.fetchall())
+#     #         con.close()
+#     #         return res
+#     #     except sqlite3.Error as err:
+#     #         logger.debug(err)
+#     #         return {}
+
+#     # def get_item_by_id(self, id) -> dict:
+#     #     try:
+#     #         con = sqlite3.connect(db_path)
+#     #         cur = con.cursor()
+#     #         cur.execute(
+#     #             """SELECT items.id, categories.name, items.name, items.image_name FROM items
+#     #                 JOIN categories ON items.category_id = categories.id WHERE items.id = ?;""", id)
+#     #         res = self.__convert_item_list_to_dict(cur.fetchall())
+#     #         con.close()
+#     #         return res
+#     #     except sqlite3.Error as err:
+#     #         logger.debug(err)
+#     #         return {}
+
+#     def add_attribute(self, event_name, max_people, min_people):
+#         try:
+#             events_repo = SqliteEventDatesRepository()
+#             event_dates_repo = SqliteEventDatesRepository()
+#             group_id = events_repo.get_id_by_name(event_name)
+#             if not group_id:
+#                 logger.debug("err")
+#                 return {}
+#             date_id = event_dates_repo.get_date_id_by_group_id(group_id)
+#             con = sqlite3.connect(db_path)
+#             cur = con.cursor()
+#             cur.execute(
+#                 """INSERT INTO event_attributes (date_id, max_poeple, min_people)
+#                    VALUES(?,?,?) RETURNING id;""",
+#                 (group_id, max_people, min_people))
+#             res = cur.fetchall()[0][0]
+#             con.commit()
+#             con.close()
+#             return res
+#         except sqlite3.Error as err:
+#             logger.debug(err)
+#             return {}
+
+#     # def search_items_by_name(self, keyword):
+#     #     try:
+#     #         con = sqlite3.connect(db_path)
+#     #         cur = con.cursor()
+#     #         cur.execute(
+#     #             """SELECT items.id, categories.name, items.name, items.image_name FROM items
+#     #                 JOIN categories ON items.category_id = categories.id
+#     #                 WHERE items.name LIKE ?""", (f'%{keyword}%',))
+#     #         res = self.__convert_item_list_to_dict(cur.fetchall())
+#     #         con.close()
+#     #         return res
+#     #     except sqlite3.Error as err:
+#     #         logger.debug(err)
+#     #         return {}
