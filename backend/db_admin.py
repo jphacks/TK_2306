@@ -2,11 +2,40 @@ import logging
 import sqlite3
 
 from typing import Optional
+from pydantic import BaseModel  # リクエストbodyを定義するために必要
 
 logger = logging.getLogger("uvicorn")
 logger.level = logging.DEBUG
 
 db_path = "../db/db.sqlite3"
+
+class Attr(BaseModel):
+    name: str
+    max_people: int
+    min_people: int
+
+class Preference(BaseModel):
+    target: str
+    value: str
+
+class DateDetails(BaseModel):
+    date: str
+    time_from: str
+    time_to: str
+    max_people: int
+    min_people: int
+    attrs: list[Attr]
+    preferences: list[Preference]
+
+class Date(BaseModel):
+    date: str
+    time_from: str
+    time_to: str
+
+class Event(BaseModel):
+    name: str
+    group_id: str
+    dates: list[DateDetails]
 
 class AdminRepository:
     def get_group_id_by_name(self, name) -> Optional[int]:
@@ -14,7 +43,7 @@ class AdminRepository:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """SELECT id from events where name = ?""", (name,))
+                """SELECT group_id from events where name = ?""", (name,))
             res = cur.fetchall()
             con.close()
             if len(res) > 0:
@@ -25,12 +54,12 @@ class AdminRepository:
             logger.debug(err)
             return None
         
-    def add_event(self, id, name) -> Optional[int]:
+    def add_event(self, id, name):
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO categories (id, name) VALUES(?, ?)""", (id, name,))
+                """INSERT INTO events (group_id, name) VALUES(?, ?)""", (id, name,))
             res = id
             con.commit()
             con.close()
@@ -40,35 +69,38 @@ class AdminRepository:
             logger.debug(err)
             return None
         
-    def get_date_id_by_group_id(self, group_id) -> Optional[int]:
+    def get_dates(self, group_id) -> list[Date]:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """SELECT id from event_dates where group_id = ?""", (group_id,))
+                """SELECT date, time_from, time_to, max_people, min_people from event_dates where group_id = ?""", (group_id,))
             res = cur.fetchall()
             con.close()
-            if len(res) > 0:
-                return res[0][0]
-            else:
-                return None
+            dates = []
+            for i in range(len(res)):
+                res_date, res_time_from, res_time_to, _, _ = res[i]
+                date = Date(date=res_date, time_from=res_time_from, time_to=res_time_to)
+                dates.append(date)
+            return dates
         except sqlite3.Error as err:
             logger.debug(err)
-            return None
+            return []
         
-    def add_date(self, event_name, date, time_from, time_to, max_people, min_people):
+    def add_date(self, group_id, date, time_from, time_to, max_people, min_people):
         try:
-            group_id = self.get_group_id_by_name(event_name)
+            # group_id = self.get_group_id_by_name(event_name)
             if not group_id:
                 logger.debug("err")
                 return {}
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO event_dates (group_id, date, time_from, time_to, max_poeple, min_people)
-                   VALUES(?,?,?,?,?,?) RETERNING id;""",
-                (group_id, date, time_from, time_to, max_people, min_people))
+                """INSERT INTO event_dates (group_id, date, time_from, time_to, max_people, min_people)
+                   VALUES(?,?,?,?,?,?) RETURNING id;""",
+                (group_id, date, time_from, time_to, max_people, min_people,))
             res = cur.fetchall()[0][0]
+            logger.debug(f"{res}")
             con.commit()
             con.close()
             return res
@@ -76,19 +108,19 @@ class AdminRepository:
             logger.debug(err)
             return {}
         
-    def add_attribute(self, event_name, max_people, min_people):
+    def add_attribute(self, date_id, attr_name, max_people, min_people):
         try:
-            group_id = self.get_id_by_name(event_name)
-            if not group_id:
-                logger.debug("err")
-                return {}
-            date_id = self.get_date_id_by_group_id(group_id)
+            # group_id = self.get_group_id_by_name(event_name)
+            # if not group_id:
+            #     logger.debug("err")
+            #     return {}
+            # date_id = self.get_date_id_by_group_id(group_id)
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO event_attributes (date_id, max_poeple, min_people)
-                   VALUES(?,?,?) RETERNING id;""",
-                (date_id, max_people, min_people))
+                """INSERT INTO event_attributes (date_id, name, max_people, min_people)
+                   VALUES(?,?,?,?) RETURNING id;""",
+                (date_id, attr_name, max_people, min_people,))
             res = cur.fetchall()[0][0]
             con.commit()
             con.close()
@@ -202,7 +234,7 @@ class AdminRepository:
 #             cur = con.cursor()
 #             cur.execute(
 #                 """INSERT INTO event_dates (group_id, date, time_from, time_to, max_poeple, min_people)
-#                    VALUES(?,?,?,?,?,?) RETERNING id;""",
+#                    VALUES(?,?,?,?,?,?) RETURNING id;""",
 #                 (group_id, date, time_from, time_to, max_people, min_people))
 #             res = cur.fetchall()[0][0]
 #             con.commit()
@@ -284,7 +316,7 @@ class AdminRepository:
 #             cur = con.cursor()
 #             cur.execute(
 #                 """INSERT INTO event_attributes (date_id, max_poeple, min_people)
-#                    VALUES(?,?,?) RETERNING id;""",
+#                    VALUES(?,?,?) RETURNING id;""",
 #                 (group_id, max_people, min_people))
 #             res = cur.fetchall()[0][0]
 #             con.commit()
