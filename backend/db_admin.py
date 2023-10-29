@@ -132,7 +132,6 @@ class AdminRepository:
                 (group_id, date, time_from, time_to, max_people, min_people,))
             
             res = cur.lastrowid
-            res = cur.fetchall()[0][0]
             logger.debug(f"{res}")
             con.commit()
             con.close()
