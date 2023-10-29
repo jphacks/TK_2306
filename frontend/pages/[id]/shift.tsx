@@ -12,7 +12,6 @@ type ConfirmedShift = {
 
 const ShiftConfirmationPage: React.FC = () => {
   const router = useRouter();
-  const { id } = router.query;
 
   const [confirmedShifts, setConfirmedShifts] = useState<ConfirmedShift[]>([]);
   const [userName, setUserName] = useState<string>('');
@@ -28,9 +27,14 @@ const ShiftConfirmationPage: React.FC = () => {
     setUserName('John Doe');
   }, []);
 
-  const handleAddToGoogleCalendar = () => {
-    // Logic to add the confirmed shifts to Google Calendar
-    console.log('Adding to Google Calendar:', confirmedShifts);
+  const handleNewRegister = () => {
+    router.push('/${Id}');
+
+  };
+
+  const handleGo = () => {
+    router.push('/${Id/shift_confirm')
+
   };
 
   return (
@@ -68,12 +72,12 @@ const ShiftConfirmationPage: React.FC = () => {
           </Box>
 
           <Box mt={2} display="flex" justifyContent="center">
-            <Button variant="contained" color="primary" onClick={handleAddToGoogleCalendar} style={{ marginTop: '10px', width: '200px', height: '50px' }}>
+            <Button variant="contained" color="primary" onClick={handleNewRegister} style={{ marginTop: '10px', width: '200px', height: '50px' }}>
               New Register
             </Button>
           </Box>
           <Box mt={20} display="flex" justifyContent="center">
-            <Button variant="contained" color="primary" onClick={handleAddToGoogleCalendar} style={{ marginTop: '10px', width: '400px', height: '70px' }}>
+            <Button variant="contained" color="primary" onClick={handleGo} style={{ marginTop: '10px', width: '400px', height: '70px' }}>
               Go
             </Button>
           </Box>
