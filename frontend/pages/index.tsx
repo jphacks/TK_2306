@@ -14,9 +14,9 @@ import DialogTitle from "@mui/material/DialogTitle"; // DialogTitleをインポ�
 import DialogContent from "@mui/material/DialogContent"; // DialogContentをインポート
 import DialogActions from "@mui/material/DialogActions"; // DialogActionsをインポート
 import { styled } from "@mui/material/styles";
-import { type } from "os";
-import axios from 'axios';
-import { useRouter } from 'next/router';
+import axios from "axios";
+import { useRouter } from "next/router";
+import dayjs from 'dayjs';
 
 type Attribute = {
   name: string;
@@ -25,18 +25,18 @@ type Attribute = {
 };
 
 type Preference = {
-  name: string;
+  target: string;
   value: string;
 };
 
 type Dates = {
   date: string;
-  from: string;
-  to: string;
+  time_from: string;
+  time_to: string;
   max_people: number;
   min_people: number;
-  attr: Attribute[];
-  preference: Preference[];
+  attrs: Attribute[];
+  preferences: Preference[];
 };
 
 type Group = {
@@ -76,7 +76,7 @@ const Q20231029 = styled("div")({
   height: `60px`,
   position: `absolute`,
   left: `28px`,
-  top: `21px`,
+  top: `0px`,
 });
 
 const Rectangle7 = styled("div")({
@@ -1089,11 +1089,11 @@ const TopPage: React.FC = () => {
     const dates = temp.map((t) => {
       return {
         date: t.date,
-        from: t.start,
-        to: t.end,
+        time_from: t.start,
+        time_to: t.end,
         max_people: t.max,
         min_people: t.min,
-        attributes: attributes,
+        attrs: attributes,
         preferences: preferences,
       };
     });
@@ -1105,9 +1105,9 @@ const TopPage: React.FC = () => {
     };
 
     const post = async () => {
-      const response = await axios.post('http://localhost:9000', {
-        postData
-      });
+      const response = await axios.post("http://localhost:9000",
+        postData,
+      );
     };
 
     post();
@@ -1167,7 +1167,7 @@ const TopPage: React.FC = () => {
             <DialogTitle>ポップアップタイトル</DialogTitle>
             <DialogContent>
               <DateDetail1>
-                <Q20231029>{`2023/10/29`}</Q20231029>
+                <Q20231029><p>{dayjs(selectedDate).format('ddd, DD MMM YYYY')}</p></Q20231029>
                 <Rectangle7></Rectangle7>
                 <From>{`from`}</From>
                 <Section>{`Section`}</Section>
@@ -1278,72 +1278,76 @@ const TopPage: React.FC = () => {
           Add Attribute
         </Button>
 
-          {preferences.map((pref, index) => (
-            <Box key={index}>
-              <TextField
-                label="Preference"
-                value={pref.name}
-                onChange={(e) => {
-                  const newPreferences = [...preferences];
-                  newPreferences[index].name = e.target.value;
-                  setPreferences(newPreferences);
-                }}
-              />
-              <TextField
-                label="Value"
-                value={pref.value}
-                onChange={(e) => {
-                  const newPreferences = [...preferences];
-                  newPreferences[index].value = e.target.value;
-                  setPreferences(newPreferences);
-                }}
-              />
-            </Box>
-          ))}
+        {attributes.map((attr, index) => (
+          <Box key={index}>
+            <TextField
+              label="name"
+              value={attr.name}
+              onChange={(e) => {
+                const newAttributes = [...attributes];
+                newAttributes[index].name = e.target.value;
+                setAttributes(newAttributes);
+              }}
+            />
+            <TextField
+              label="Min"
+              value={attr.min_people}
+              onChange={(e) => {
+                const newAttributes = [...attributes];
+                newAttributes[index].min_people = Number(e.target.value);
+                setAttributes(newAttributes);
+              }}
+            />
+            <TextField
+              label="Max"
+              value={attr.min_people}
+              onChange={(e) => {
+                const newAttributes = [...attributes];
+                newAttributes[index].min_people = Number(e.target.value);
+                setAttributes(newAttributes);
+              }}
+            />
+          </Box>
+        ))}
 
-          <Button variant="contained" color="primary" onClick={addPreference}>
-            Add Preference
-          </Button>
+        <Button variant="contained" color="primary" onClick={addPreference}>
+          Add Preference
+        </Button>
 
-          {preferences.map((pref, index) => (
-            <Box key={index}>
-              <TextField
-                label="Preference"
-                value={pref.name}
-                onChange={(e) => {
-                  const newPreferences = [...preferences];
-                  newPreferences[index].name = e.target.value;
-                  setPreferences(newPreferences);
-                }}
-              />
-              <TextField
-                label="Value"
-                value={pref.value}
-                onChange={(e) => {
-                  const newPreferences = [...preferences];
-                  newPreferences[index].value = e.target.value;
-                  setPreferences(newPreferences);
-                }}
-              />
-            </Box>
-          ))}
+        {preferences.map((pref, index) => (
+          <Box key={index}>
+            <TextField
+              label="Preference"
+              value={pref.name}
+              onChange={(e) => {
+                const newPreferences = [...preferences];
+                newPreferences[index].name = e.target.value;
+                setPreferences(newPreferences);
+              }}
+            />
+            <TextField
+              label="Value"
+              value={pref.value}
+              onChange={(e) => {
+                const newPreferences = [...preferences];
+                newPreferences[index].value = e.target.value;
+                setPreferences(newPreferences);
+              }}
+            />
+          </Box>
+        ))}
 
-          <Button variant="contained" color="secondary" onClick={handleCreate}>
-            作成
-          </Button>
+        <Button variant="contained" color="secondary" onClick={handleCreate}>
+          作成
+        </Button>
 
-          <Button variant="contained" color="primary" onClick={handlePopupOpen}>
+        {/* <Button variant="contained" color="primary" onClick={handlePopupOpen}>
             Open Popup
-          </Button>
+          </Button> */}
 
-
-
-
-
-
-          {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
+        {/* {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>} */}
       </Theme>
-        </Container>
+    </Container>
   );
 };
 
