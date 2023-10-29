@@ -19,7 +19,7 @@ workers_attributes: list[list[int]] = [[0, 1], [0, 1], [0, 1], [0, 1], [], [], [
 attributes_requirements: list[list[list[tuple[int, int]]]] = [[
     [(1, 2), (1, 2)], [(1, 2), (1, 2)], [(1, 2), (1, 2)], [(1, 2), (1, 2)], [(1, 2), (1, 2)]
 ] + [[(0, 10), (0, 10)] for _ in range(43)]]
-min_time = [[0] for _ in range(days)]
+min_time = [[0] for _ in range(48)]
 constraints = []
 
 input_ = (days, workers, attributes, shift_preferences,

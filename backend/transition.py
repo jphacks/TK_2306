@@ -12,3 +12,4 @@ def trans(days, workers, candidate:list[list[list[list[tuple[int, int]]]]]):
     res = []
     for sol in candidate:
         res.append(transition_time_table(days,workers,sol))
+    return res
