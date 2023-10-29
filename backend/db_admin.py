@@ -86,6 +86,37 @@ class AdminRepository:
         except sqlite3.Error as err:
             logger.debug(err)
             return []
+
+    def get_date_ids(self, group_id) -> list[(int, str, str, str)]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT id, date, time_from, time_to from event_dates where group_id = ?""", (group_id,))
+            res = cur.fetchall()
+            con.close()
+            return res
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return []
+        
+    def get_date_details(self, group_id) -> list[DateDetails]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT date, time_from, time_to, max_people, min_people from event_dates where group_id = ?""", (group_id,))
+            res = cur.fetchall()
+            con.close()
+            dates = []
+            for i in range(len(res)):
+                res_date, res_time_from, res_time_to, max_people, min_people = res[i]
+                date = DateDetails(date=res_date, time_from=res_time_from, time_to=res_time_to, max_people=max_people, min_people=min_people, attrs=[], preferences=[])
+                dates.append(date)
+            return dates
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return []
         
     def add_date(self, group_id, date, time_from, time_to, max_people, min_people):
         try:
@@ -156,6 +187,19 @@ class AdminRepository:
             # logger.debug(f"{attrs}")
             return attrs
         except sqlite3.Error as err:
+            logger.debug(err)
+            return []
+    
+    def get_attr_details(self, group_id: str) -> list[(int, int, int, int)]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT id, date_id, max_people, min_people from event_attributes where date_id in (select id from event_dates where group_id = ?)""", (group_id,))
+            res = cur.fetchall()
+            con.close()
+            return res 
+        except sqlite3.Error as err: 
             logger.debug(err)
             return []
 
