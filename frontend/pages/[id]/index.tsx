@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import styles from 'styles/index.module.css';
-import 'react-datepicker/dist/react-datepicker.css';
-import TimeSlotTable from './timeslottable';
-import CheckBoxGroup from './checkbox';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import axios from "axios";
+import styles from "styles/index.module.css";
+import "react-datepicker/dist/react-datepicker.css";
+import TimeSlotTable from "./timeslottable";
+import CheckBoxGroup from "./checkbox";
 import Banner from "../../components/Banner";
-import { dateCalendarClasses } from '@mui/x-date-pickers-pro';
-import { set } from 'react-hook-form';
+import { dateCalendarClasses } from "@mui/x-date-pickers-pro";
+import { set } from "react-hook-form";
+import { useForm, Controller, useFieldArray, Control } from "react-hook-form";
+import { get } from "http";
 
 type UserAttribute = {
   id: number;
@@ -18,7 +20,7 @@ type DateCandidate = {
   date: string;
   time_from: string;
   time_to: string;
-}
+};
 
 type UserPreference = {
   name: string;
@@ -34,37 +36,26 @@ type UserShift = {
   date: string;
   from: string;
   to: string;
-  status: '○' | '△' | '×';
+  status: "○" | "△" | "×";
 };
 
 const UserPage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const [userName, setUserName] = useState<string>('');
-  const [selectedAttribute, setSelectedAttribute] = useState<string[]>([]);
+  const [userName, setUserName] = useState<string>("");
   const [dates, setDates] = useState<string[]>([]);
   const [attribute, setAttributes] = useState<UserAttribute[]>([]);
   const [candidateTimes, setCandidateTimes] = useState<string[][]>([]);
-  const handleSelectionChange = (selectedValues: string[]) => {
-    setSelectedAttribute(selectedValues);
-  };
-  const [userPreferences, setUserPreferences] = useState<UserPreference[]>([]);
-  const [userShifts, setUserShifts] = useState<UserShift[]>([]);
-
-  // const dates = [new Date('2023-11-01'), new Date('2023-11-02'), new Date('2023-11-03')];
-  // const candidateTimes = [
-  //   ["09:00", "09:30", "10:00", "10:30"],
-  //   ["08:30", "09:00", "09:30", "10:00"],
-  //   ["13:00", "14:00"]
-  // ];
-
-  // const attribute = [
-  //   { label: '男性', value: '男性' },
-  //   { label: '女性', value: '女性' },
-  //   { label: '係長', value: '係長' },
-  // ];
-
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const { register, control, getValues, setValue } = useForm<{
+    dates: {
+      from_time: string;
+      to_time: string;
+    }[][];
+  }>({
+    defaultValues: { dates: [] },
+  });
 
   useEffect(() => {
     fetch(`http://localhost:9000/attrs/${id}`)
@@ -77,7 +68,7 @@ const UserPage: React.FC = () => {
       .then(async (response) => {
         setAttributes(response["attrs"]);
         console.log("User attributes:", response["attrs"]);
-      });  
+      });
     fetch(`http://localhost:9000/dates/${id}`)
       .then(async (response) => {
         if (!response.ok) {
@@ -86,32 +77,60 @@ const UserPage: React.FC = () => {
         return await response.json();
       })
       .then(async (response) => {
-        const res : DateCandidate[] = response["dates"];
+        const res: DateCandidate[] = response["dates"];
         const dates = new Set(res.map((date: DateCandidate) => date.date));
-        const datesArray = Array.from(dates);
-        var candidateTimes = datesArray.map(() => []);
+        const datesArray: string[] = Array.from(dates);
+        var candidateTimes: string[][] = datesArray.map(() => []);
         for (var date of res) {
           const index = datesArray.indexOf(date.date);
           candidateTimes[index].push(date.time_from, date.time_to);
         }
-        console.log("candidateTiems:", candidateTimes);
+        setValue(
+          "dates",
+          datesArray.map(() => [{ from_time: "", to_time: "" }])
+        );
         setDates(datesArray);
         setCandidateTimes(candidateTimes);
-      });  
+      });
   }, [id]);
+
+  const getAttributes = () => {
+    var res = [];
+    for (var attr of attribute) {
+      if (selectedOptions.includes(attr.name)) {
+        res.push({ attr_id: attr.id, value: true });
+      } else {
+        res.push({ attr_id: attr.id, value: false });
+      }
+    }
+    return res;
+  };
+
+  const getCandidates = () => {
+    const values = getValues();
+    var res: { date: string; time_from: string; time_to: string }[] = [];
+    values.dates.forEach((date, index) => {
+      for (var element of date) {
+        res.push({
+          date: dates[index],
+          time_from: element.from_time,
+          time_to: element.to_time,
+        });
+      }
+    });
+    return res;
+  };
 
   const handleSubmit = () => {
     const postData = {
       group_id: id,
-      event_name: userName,
-      attr: userAttributes,
-      candidates: userShifts,
+      name: userName,
+      attr: getAttributes(),
+      candidates: getCandidates(),
     };
-
-    console.log('POST Data:', postData);
-
-    // Navigate to the shift confirmation page
-    router.push(`/${id}/shift`);
+    console.log("POST Data:", postData);
+    // // Navigate to the shift confirmation page
+    // router.push(`/${id}/shift`);
   };
 
   const handlePreferenceChange = (from_time: string, to_time: string) => {
@@ -139,13 +158,22 @@ const UserPage: React.FC = () => {
         </div>
         <div className={styles.formsection}>
           <p>属性選択</p>
-          <CheckBoxGroup options={attribute} onChange={handleSelectionChange} />
+          <CheckBoxGroup
+            options={attribute}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
+          />
         </div>
         <div>
-        <p>希望日時選択</p>
-          <TimeSlotTable dates={dates} candidateTimes={candidateTimes} onPreferenceChange={handlePreferenceChange} />
-      </div>
-      <div className={styles.buttonContainer}>
+          <p>希望日時選択</p>
+          <TimeSlotTable
+            register={register}
+            dates={dates}
+            candidateTimes={candidateTimes}
+            control={control}
+          />
+        </div>
+        <div className={styles.buttonContainer}>
           <button className={styles.createButton} onClick={handleSubmit}>
             シフト生成
           </button>

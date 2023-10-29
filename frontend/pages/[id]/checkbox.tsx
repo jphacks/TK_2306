@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
 
-type Option = {
-  id: string;
+type UserAttribute = {
+  id: number;
   name: string;
 };
 
 type CheckBoxGroupProps = {
-  options: Option[];
-  onChange: (selectedOptions: string[]) => void;
+  options: UserAttribute[];
+  selectedOptions: string[];
+  setSelectedOptions: (selectedOptions: string[]) => void;
 };
 
-const CheckBoxGroup: React.FC<CheckBoxGroupProps> = ({ options, onChange }) => {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+const CheckBoxGroup: React.FC<CheckBoxGroupProps> = ({ options, selectedOptions, setSelectedOptions }) => {
+  // const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    console.log("value", value);
     if (selectedOptions.includes(value)) {
       setSelectedOptions(selectedOptions.filter((option) => option !== value));
     } else {
       setSelectedOptions([...selectedOptions, value]);
     }
-    onChange(selectedOptions);
   };
 
   return (
@@ -30,8 +31,7 @@ const CheckBoxGroup: React.FC<CheckBoxGroupProps> = ({ options, onChange }) => {
           <input
             type="checkbox"
             value={option.name}
-            checked={selectedOptions.includes(option.name)}
-            onChange={handleCheckboxChange}
+            onChange={(e) => {handleCheckboxChange(e)}}
           />
           {option.name}
         </label>
