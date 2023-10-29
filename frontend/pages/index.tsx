@@ -6,15 +6,13 @@ import {
   Container,
   Typography,
   Box,
-  Grid,
-  ThemeProvider,
-  createTheme,
 } from "@mui/material";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import Dialog from "@mui/material/Dialog";
 import PopupContent from "./PopupContent";
 import Banner from '../components/Banner';
+import Theme from '../components/Theme';
 
 type Attribute = {
   name: string;
@@ -43,6 +41,8 @@ const TopPage: React.FC = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [openPopup, setOpenPopup] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+
 
   const handleCreate = () => {
     const Id = uuidv4();
@@ -57,6 +57,11 @@ const TopPage: React.FC = () => {
 
     console.log("User URL:", generatedUserUrl);
     console.log("POST Data:", postData);
+  };
+
+  const handleDateChange = (date : any) => {
+    setSelectedDate(date);
+    handlePopupOpen();
   };
 
   const handlePopupOpen = () => {
@@ -79,25 +84,9 @@ const TopPage: React.FC = () => {
     setPreferences([...preferences, { name: "", value: "" }]);
   };
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  const handleDateChange = (date: any) => {
-    setSelectedDate(date);
-    handlePopupOpen();
-  };
-
-  const theme = createTheme({
-    palette: {
-      primary: {
-        main: "#D9D9D9",
-      },
-    },
-  });
-
   return (
     <Container>
-      <ThemeProvider theme={theme}>
+      <Theme>
         <Banner/>
         <Typography variant="h4">シフト管理 - 管理者画面</Typography>
         <Box>
@@ -179,12 +168,12 @@ const TopPage: React.FC = () => {
           </Box>
         ))}
 
-        <Button variant="contained" color="secondary" onClick={handleCreate}>
+        <Button variant="contained" color="primary" onClick={handleCreate}>
           作成
         </Button>
 
         {groupUrl && <Typography variant="body1">URL: {groupUrl}</Typography>}
-      </ThemeProvider>
+      </Theme>
     </Container>
   );
 };
