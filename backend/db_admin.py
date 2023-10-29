@@ -128,6 +128,34 @@ class AdminRepository:
         except sqlite3.Error as err:
             logger.debug(err)
             return {}
+        
+    def get_attrs(self, group_id) -> list[dict]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT id from event_dates where group_id = ?""", (group_id,))
+            date_ids = cur.fetchall()
+            con.close()
+
+            attrs = []
+
+            for i in range(len(date_ids)):
+                date_id, = date_ids[i]
+                con = sqlite3.connect(db_path)
+                cur = con.cursor()
+                cur.execute(
+                    """SELECT id, name from event_attributes where date_id = ?""", (date_id,))
+                res = cur.fetchall()
+                con.close()
+                for j in range(len(res)):
+                    res_attr_id, res_sttr_name = res[j]
+                    attrs.append({"id": res_attr_id, "name": res_sttr_name})
+            # logger.debug(f"{attrs}")
+            return attrs
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return []
 
 
 # class SqliteEventsRepository:
