@@ -14,8 +14,8 @@ class UserRepository:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO users(user_name, group_id) VALUES (?, ?) RETURNING id;""", (name, group_id))
-            res = cur.fetchall()[0][0]
+                """INSERT INTO users(user_name, group_id) VALUES (?, ?);""", (name, group_id))
+            res = cur.lastrowid
             con.commit()
             con.close()
             return res
