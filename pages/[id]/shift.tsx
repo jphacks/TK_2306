@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from '@mui/material';
-
+import Theme from '../../components/Theme';
 
 type ConfirmedShift = {
   date: string;
@@ -33,18 +33,29 @@ const ShiftConfirmationPage: React.FC = () => {
   };
 
   return (
+    <Theme>
     <div>
   <Typography variant="h4">シフト確認画面</Typography>
 
   <Box display="flex" justifyContent="center">
   <TableContainer component={Paper} style = {{width: '80%', maxWidth: '1000px'}}>
   <Table stickyHeader>
-  <TableBody >
+  <TableBody>
+    <TableRow>
+      <TableCell>{" "}</TableCell>
+      <TableCell sx={{borderLeft: '1px solid black'}}>{"2023/11/01"}</TableCell>
+      <TableCell sx={{borderLeft: '1px solid black'}}>{"2023/11/02"}</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>{" "}</TableCell>
+      <TableCell sx={{borderLeft: '1px solid black'}}>{"9:00"}~{"17:00"}</TableCell>
+      <TableCell sx={{borderLeft: '1px solid black'}}>{"10:00"}~{"18:00"}</TableCell>
+    </TableRow>
   <TableRow>
     <TableCell>{userName}</TableCell>
     {confirmedShifts.map((shift, index) => (
       <React.Fragment key={index}>
-        <TableCell>{shift.date}:{shift.from}~{shift.to}</TableCell>
+        <TableCell sx={{borderLeft: '1px solid black'}}>{shift.from}~{shift.to}</TableCell>
       </React.Fragment>
     ))}
   </TableRow>
@@ -64,6 +75,7 @@ const ShiftConfirmationPage: React.FC = () => {
     </Button>
   </Box>
 </div>
+</Theme>
 
     
   );
