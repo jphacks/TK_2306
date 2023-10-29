@@ -6,10 +6,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import TimeSlotTable from "./timeslottable";
 import CheckBoxGroup from "./checkbox";
 import Banner from "../../components/Banner";
-import { useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { get } from "http";
-
-const URL = process.env.API_URL || 'http://localhost:9000';
 
 type UserAttribute = {
   id: number;
@@ -23,6 +21,7 @@ type DateCandidate = {
 };
 
 const UserPage: React.FC = () => {
+  const URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000";
   const router = useRouter();
   const { id } = router.query;
 
@@ -30,7 +29,9 @@ const UserPage: React.FC = () => {
   const [dates, setDates] = useState<string[]>([]);
   const [attribute, setAttributes] = useState<UserAttribute[]>([]);
   const [candidateTimes, setCandidateTimes] = useState<string[][]>([]);
-  const [selectedOptions, setSelectedOptions] = useState<{attr_id: number, value: boolean}[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<
+    { attr_id: number; value: boolean }[]
+  >([]);
   const { register, control, getValues, setValue } = useForm<{
     dates: {
       from_time: string;
@@ -50,10 +51,15 @@ const UserPage: React.FC = () => {
       })
       .then(async (response) => {
         setAttributes(response["attrs"]);
-        setSelectedOptions(response["attrs"].map((attr: UserAttribute) => ({attr_id: attr.id, value: false})));
+        setSelectedOptions(
+          response["attrs"].map((attr: UserAttribute) => ({
+            attr_id: attr.id,
+            value: false,
+          }))
+        );
         console.log("User attributes:", response["attrs"]);
       });
-    
+
     fetch(`${URL}/dates/${id}`)
       .then(async (response) => {
         if (!response.ok) {
@@ -79,7 +85,6 @@ const UserPage: React.FC = () => {
       });
   }, [id]);
 
-
   const getCandidates = () => {
     const values = getValues();
     var res: { date: string; time_from: string; time_to: string }[] = [];
@@ -96,11 +101,14 @@ const UserPage: React.FC = () => {
   };
 
   const getAttributes = () => {
-    return selectedOptions.map(option => ({attr_id: option.attr_id, value: option.value}))
-  }
+    return selectedOptions.map((option) => ({
+      attr_id: option.attr_id,
+      value: option.value,
+    }));
+  };
 
   const handleSubmit = async () => {
-    console.log("Selected options:", selectedOptions)
+    console.log("Selected options:", selectedOptions);
     const postData = {
       group_id: id,
       name: userName,
@@ -108,9 +116,7 @@ const UserPage: React.FC = () => {
       dates: getCandidates(),
     };
     console.log("POST Data:", postData);
-    const _ = await axios.post(`${URL}/users`,
-      postData,
-    );
+    const _ = await axios.post(`${URL}/users`, postData);
     // // Navigate to the shift confirmation page
     router.push(`/${id}/shift`);
   };

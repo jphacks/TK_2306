@@ -14,8 +14,6 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-const URL = process.env.API_URL || 'http://localhost:9000';
-
 type Attribute = {
   name: string;
   max_people: number;
@@ -68,6 +66,8 @@ const TopPage: React.FC = () => {
   const [selectedMin, setSelectedMin] = useState<number>(0);
   const [temp, setTemp] = useState<Temp[]>([]);
   const router = useRouter();
+
+  const URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000";
 
   const handleCreate = () => {
     const Id = uuidv4();
