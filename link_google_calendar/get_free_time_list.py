@@ -22,7 +22,7 @@ def get_free_time_list(start_date, end_date, start_time, end_time):
     return free_time_list
 
 def get_free_time(date, start_time, end_time, calendarId):
-    creds = service_account.Credentials.from_service_account_file('jphack-tk-2306-100a02fa5204.json')
+    creds = service_account.Credentials.from_service_account_file('./jphack-tk-2306-100a02fa5204.json')
     service = build('calendar', 'v3', credentials=creds)
     day = {
         "00:00-00:29": 1,

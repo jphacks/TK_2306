@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Banner from "../../components/Banner";
+import Axios from 'axios';
 
 type ConfirmedShift = {
   date: string;
@@ -28,6 +29,19 @@ const ShiftConfirmationPage: React.FC = () => {
 
   const handleAddToGoogleCalendar = async () => {
     console.log('Adding to Google Calendar:', confirmedShifts);
+    try {
+        const response = await Axios.post('http://10.0.2.2:8888', {
+            post_text: ''
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }
+        });
+        console.log('Response:', response.data);
+    } catch (error) {
+        console.error('Error:', error);
+    }
   };
 
   return (
