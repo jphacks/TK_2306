@@ -1,5 +1,6 @@
 import random
 import time
+import unittest
 
 class State:
     def __init__(self,days:int,number_of_attributes:int,
@@ -182,41 +183,102 @@ def get_initial_solutions(
                 failcnt += 1
     return ret
 
-def test():
-    dummy_shift_preferences_per_person: list[list[list[tuple[int, int]]]] = [
-        [[(1, 2), (2, 3), (4, 5)]],
-        [[(0, 1), (3, 4), (4, 5)]],
-        [[(0, 1), (1, 2), (4, 5)]],
-        [[(0, 1), (2, 3), (3, 4)]],
-        [[(0, 1), (3, 4), (4, 5)]],
-        [[(0, 1), (2, 3), (4, 5)]],
-        [[(0, 2), (3, 5)]],
-    ]
-    number_of_days = 1
-    number_of_people = 7
-    number_of_attributes = 2
-    dummy_shift_requirements_per_time: list[list[tuple[int, int]]] =[[
-        (2, 4), (2, 4), (2, 4), (2, 4), (2, 4)
-    ]+ [(0, 10) for _ in range(43)]]
-    dummy_attributes_per_person: list[list[int]] = [[0, 1], [0, 1], [0, 1], [0, 1], [], [], []]
-    dummy_attributes_requirements_per_time: list[list[list[tuple[int, int]]]] = [[
-        [(1, 2), (1, 2)], [(1, 2), (1, 2)], [(1, 2), (1, 2)], [(1, 2), (1, 2)], [(1, 2), (1, 2)]
-    ] + [[(0, 10), (0, 10)] for _ in range(43)]]
+class Tests(unittest.TestCase):
+    def test_easy(self):
+        dummy_shift_preferences_per_person: list[list[list[tuple[int, int]]]] = [
+            [[(1, 2), (2, 3), (4, 5)]],
+            [[(0, 1), (3, 4), (4, 5)]],
+            [[(0, 1), (1, 2), (4, 5)]],
+            [[(0, 1), (2, 3), (3, 4)]],
+            [[(0, 1), (3, 4), (4, 5)]],
+            [[(0, 1), (2, 3), (4, 5)]],
+            [[(0, 2), (3, 5)]],
+        ]
 
-    solution = get_initial_solutions(
-        0.5,
-        number_of_people,
-        number_of_days,
-        number_of_attributes,
-        dummy_shift_preferences_per_person,
-        dummy_shift_requirements_per_time,
-        dummy_attributes_per_person,
-        dummy_attributes_requirements_per_time,
-        debug=True,
-    )
-    print("ans = ")
-    print(solution)
+        number_of_days = 1
+        number_of_people = 7
+        number_of_attributes = 2
+        dummy_shift_requirements_per_time: list[list[tuple[int, int]]] = [
+            [(2, 4), (2, 4), (2, 4), (2, 4), (2, 4)] + [(0, 10) for _ in range(43)]
+        ]
+        dummy_attributes_per_person: list[list[int]] = [
+            [0, 1],
+            [0, 1],
+            [0, 1],
+            [0, 1],
+            [],
+            [],
+            [],
+        ]
+        dummy_attributes_requirements_per_time: list[list[list[tuple[int, int]]]] = [
+            [
+                [(1, 2), (1, 2)],
+                [(1, 2), (1, 2)],
+                [(1, 2), (1, 2)],
+                [(1, 2), (1, 2)],
+                [(1, 2), (1, 2)],
+            ]
+            + [[(0, 10), (0, 10)] for _ in range(43)]
+        ]
 
+        solution = get_initial_solutions(
+            0.5,
+            number_of_people,
+            number_of_days,
+            number_of_attributes,
+            dummy_shift_preferences_per_person,
+            dummy_shift_requirements_per_time,
+            dummy_attributes_per_person,
+            dummy_attributes_requirements_per_time,
+            debug=False,
+        )
+        assert len(solution) > 0
+        # print("ans = ")
+        # for sol in solution:
+        #     print(sol)
+
+    def test_hard(self):
+        number_of_days = 1
+        number_of_people = 4
+        number_of_attributes = 2
+        dummy_shift_preferences_per_person: list[list[list[tuple[int, int]]]] = [
+            [[(0, 3)]],
+            [[(1, 4)]],
+            [[(2, 4)]],
+            [[(0, 5)]],
+        ]
+        dummy_attributes_per_person: list[list[int]] = [
+            [0],
+            [0],
+            [1],
+            [1],
+        ]
+        dummy_attributes_requirements_per_time: list[list[list[tuple[int, int]]]] = [
+            [[(0, 1), (0, 1)], [(2, 2), (0, 1)], [(0, 1), (0, 1)], [(0, 1), (2, 2)]] + [[(0, 1), (0, 1)] for _ in range(44)]
+        ]
+        # dummy_attributes_requirements_per_time: list[list[list[tuple[int, int]]]] = [
+        #     [[(0, 2), (0, 2)] for _ in range(48)]
+        # ]
+        dummy_shift_requirements_per_time: list[list[tuple[int, int]]] = [
+            [(1, 2)] * 5 + [(0, 0)] * 43
+        ]
+
+        solution = get_initial_solutions(
+            2,
+            number_of_people,
+            number_of_days,
+            number_of_attributes,
+            dummy_shift_preferences_per_person,
+            dummy_shift_requirements_per_time,
+            dummy_attributes_per_person,
+            dummy_attributes_requirements_per_time,
+            debug=False,
+        )
+
+        print("ans = ")
+        for sol in solution:
+            print(sol)
+        assert([[[(0, 2)]],[[(1, 2)]], [[(2, 3)]], [[(3, 5)]]] in solution)
 
 if __name__ == "__main__":
-    test()
+    unittest.main()
