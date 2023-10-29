@@ -5,6 +5,7 @@ import styles from 'styles/index.module.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import TimeSlotTable from './timeslottable';
+import CheckBoxGroup from './checkbox';
 
 type UserAttribute = {
   name: string;
@@ -33,7 +34,10 @@ const UserPage: React.FC = () => {
 
   const [userName, setUserName] = useState<string>('');
   const [userAttributes, setUserAttributes] = useState<UserAttribute[]>([]);
-  const [selectedAttribute, setSelectedAttribute] = useState<number | null>(null);
+  const [selectedAttribute, setSelectedAttribute] = useState([]);
+  const handleSelectionChange = (selectedValues) => {
+    setSelectedAttribute(selectedValues);
+  };
   const [userPreferences, setUserPreferences] = useState<UserPreference[]>([]);
   const [userShifts, setUserShifts] = useState<UserShift[]>([]);
 
@@ -42,6 +46,11 @@ const UserPage: React.FC = () => {
     ["09:00", "09:30", "10:00", "10:30"],
     ["08:30", "09:00", "09:30", "10:00"],
     ["13:00", "14:00"]
+  ];
+  const attribute = [
+    { label: '男性', value: '男性' },
+    { label: '女性', value: '女性' },
+    { label: '係長', value: '係長' },
   ];
 
 
@@ -60,8 +69,6 @@ const UserPage: React.FC = () => {
 
 
   const handleSubmit = () => {
-    // POST request to save the user input to the database
-    // You would typically use fetch or axios here to send the data to your server
     const postData = {
       group_id: id,
       event_name: userName,
@@ -97,20 +104,11 @@ const UserPage: React.FC = () => {
         </div>
       </div>
       <div className={styles.formsection}>
-        <select
-          multiple
-          value={selectedAttribute || ''}
-          onChangeCapture={(e) => setSelectedAttribute(parseInt(e.target.value, 10))}
-        >
-          {userAttributes.map((attribute) => (
-            <option key={attribute.id} value={attribute.id}>
-              {attribute.name}
-            </option>
-          ))}
-        </select>
+        <p>属性選択</p>
+        <CheckBoxGroup options={attribute} onChange={handleSelectionChange} />
       </div>
       <div>
-      <h1>希望日時選択</h1>
+      <p>希望日時選択</p>
         <TimeSlotTable dates={dates} candidateTimes={candidateTimes} onPreferenceChange={handlePreferenceChange} />
     </div>
     <div className={styles.buttonContainer}>
