@@ -41,5 +41,5 @@ const ShiftConfirmationTable: React.FC<ShiftConfirmationTableProps> = ({ dates, 
   );
 };
 
-export default TimeSlotTable;
+export default ShiftConfirmationTable;
 
