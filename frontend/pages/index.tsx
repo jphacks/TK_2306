@@ -82,7 +82,7 @@ const TopPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const handleDateChange = (date) => {
+  const handleDateChange = (date: any) => {
     setSelectedDate(date);
     handlePopupOpen();
   };
