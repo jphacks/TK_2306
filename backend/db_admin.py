@@ -7,7 +7,7 @@ from pydantic import BaseModel  # リクエストbodyを定義するために必
 logger = logging.getLogger("uvicorn")
 logger.level = logging.DEBUG
 
-db_path = "../db/db.sqlite3"
+db_path = "../db/db.sqlite"
 
 class Attr(BaseModel):
     name: str
