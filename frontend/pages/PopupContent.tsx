@@ -5,7 +5,7 @@ import DialogActions from '@mui/material/DialogActions'; // DialogActionsをイ�
 import Button from '@mui/material/Button'; // Buttonをインポート// PopupContent.js
 import DateDetail from './test';
 
-function PopupContent({onClose}) {
+function PopupContent(props: { onClose: () => void }) {
   return (
     <div>
       <DialogTitle>ポップアップタイトル</DialogTitle>
@@ -14,7 +14,7 @@ function PopupContent({onClose}) {
         <p>ポップアップのコンテンツ</p>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={props.onClose} color="primary">
           閉じる
         </Button>
       </DialogActions>

@@ -1053,7 +1053,7 @@ const TopPage: React.FC = () => {
     console.log("POST Data:", postData);
   };
 
-  const handleDateChange = (date) => {
+  const handleDateChange = (date : any) => {
     setSelectedDate(date);
     handlePopupOpen();
   };
