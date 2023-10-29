@@ -1,16 +1,22 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Button, TextField, Container, Typography, Box } from "@mui/material";
-import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers-pro";
+import {
+  DateCalendar,
+  LocalizationProvider,
+  dateCalendarClasses,
+} from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import Dialog from "@mui/material/Dialog";
-import PopupContent from "./PopupContent";
 import Banner from "../components/Banner";
 import Theme from "../components/Theme";
 import DialogTitle from "@mui/material/DialogTitle"; // DialogTitleをインポート
 import DialogContent from "@mui/material/DialogContent"; // DialogContentをインポート
 import DialogActions from "@mui/material/DialogActions"; // DialogActionsをインポート
 import { styled } from "@mui/material/styles";
+import { type } from "os";
+import axios from 'axios';
+import { useRouter } from 'next/router';
 
 type Attribute = {
   name: string;
@@ -23,7 +29,7 @@ type Preference = {
   value: string;
 };
 
-type Candidate = {
+type Dates = {
   date: string;
   from: string;
   to: string;
@@ -31,6 +37,12 @@ type Candidate = {
   min_people: number;
   attr: Attribute[];
   preference: Preference[];
+};
+
+type Group = {
+  name: string;
+  group_id: string;
+  dates: Dates[];
 };
 
 const DateDetail1 = styled("div")({
@@ -359,6 +371,23 @@ const AddNewSection = styled("div")({
   position: `absolute`,
   left: `166px`,
   top: `1209px`,
+});
+
+const AddAttribute = styled("div")({
+  textAlign: `left`,
+  whiteSpace: `pre-wrap`,
+  fontSynthesis: `none`,
+  color: `rgba(50, 181, 255, 1)`,
+  fontStyle: `normal`,
+  fontFamily: `Alatsi`,
+  fontWeight: `400`,
+  fontSize: `24px`,
+  letterSpacing: `0.24px`,
+  textDecoration: `none`,
+  textTransform: `none`,
+  position: `absolute`,
+  left: `193px`,
+  top: `434px`,
 });
 
 const AddPreference = styled("div")({
@@ -1030,30 +1059,67 @@ const Line61 = styled("div")({
   top: `996px`,
 });
 
+type Temp = {
+  date: string;
+  start: string;
+  end: string;
+  max: number;
+  min: number;
+};
+
 const TopPage: React.FC = () => {
   const [shiftName, setShiftName] = useState<string>("");
   const [groupUrl, setGroupUrl] = useState<string>("");
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [preferences, setPreferences] = useState<Preference[]>([]);
   const [openPopup, setOpenPopup] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedStart, setSelectedStart] = useState<string>("");
+  const [selectedEnd, setSelectedEnd] = useState<string>("");
+  const [selectedMax, setSelectedMax] = useState<number>(0);
+  const [selectedMin, setSelectedMin] = useState<number>(0);
+  const [temp, setTemp] = useState<Temp[]>([]);
+  const [group, setGroup] = useState<Group>({
+    name: "",
+    group_id: "",
+    dates: [],
+  });
+  const router = useRouter();
 
   const handleCreate = () => {
     const Id = uuidv4();
     const generatedUserUrl = `${Id}`;
     setGroupUrl(generatedUserUrl);
 
+    const dates = temp.map((t) => {
+      return {
+        date: t.date,
+        from: t.start,
+        to: t.end,
+        max_people: t.max,
+        min_people: t.min,
+        attributes: attributes,
+        preferences: preferences,
+      };
+    });
+
     const postData = {
+      name: shiftName,
       group_id: Id,
-      event_name: shiftName,
-      // ... other fields
+      dates: dates,
     };
 
-    console.log("User URL:", generatedUserUrl);
-    console.log("POST Data:", postData);
+    const post = async () => {
+      const response = await axios.post('http://localhost:9000', {
+        postData
+      });
+    };
+
+    post();
+    router.push(`/${Id}`);
   };
 
-  const handleDateChange = (date : any) => {
+  const handleDateChange = (date: any) => {
     setSelectedDate(date);
     handlePopupOpen();
   };
@@ -1067,6 +1133,16 @@ const TopPage: React.FC = () => {
 
   const handlePopupClose = () => {
     // ポップアップを閉じる
+    setTemp([
+      ...temp,
+      {
+        date: selectedDate,
+        start: selectedStart,
+        end: selectedEnd,
+        max: selectedMax,
+        min: selectedMin,
+      },
+    ]);
     setOpenPopup(false);
   };
 
@@ -1102,148 +1178,102 @@ const TopPage: React.FC = () => {
                 <Section>{`Section`}</Section>
                 <To>{`to`}</To>
                 <Group1>
-                  <Rectangle4></Rectangle4>
-                  {/* <Polygon1 src={Polygon1Image} loading='lazy' alt={"Polygon 1"}/> */}
+                  <TextField
+                    label="My Label"
+                    inputProps={{
+                      style: {
+                        backgroundColor: "rgba(255, 255, 255, 1)",
+                        border: "1px solid rgba(0, 0, 0, 1)",
+                        boxSizing: "border-box",
+                        width: "276px",
+                        height: "24px",
+                        position: "absolute",
+                        left: "0px",
+                        top: "0px",
+                      },
+                    }}
+                    value={selectedStart}
+                    onChange={(e) => setSelectedStart(e.target.value)}
+                  />
+                  {/* <Rectangle4 value={selectedStart} onChange={(e) => setSelectedStart(e.target.value)}></Rectangle4> */}
                 </Group1>
                 <Group2>
-                  <Rectangle41></Rectangle41>
-                  {/* <Polygon11 src={Polygon11Image} loading='lazy' alt={"Polygon 1"}/> */}
+                  <TextField
+                    label="My Label2"
+                    inputProps={{
+                      style: {
+                        backgroundColor: "rgba(255, 255, 255, 1)",
+                        border: "1px solid rgba(0, 0, 0, 1)",
+                        boxSizing: "border-box",
+                        width: "276px",
+                        height: "24px",
+                        position: "absolute",
+                        left: "0px",
+                        top: "0px",
+                      },
+                    }}
+                    value={selectedEnd}
+                    onChange={(e) => setSelectedEnd(e.target.value)}
+                  />
                 </Group2>
-                <Group11>
-                  <Rectangle42></Rectangle42>
-                  {/* <Polygon12 src={Polygon12Image} loading='lazy' alt={"Polygon 1"}/> */}
-                </Group11>
                 <Group7>
-                  <Rectangle43></Rectangle43>
+                  <TextField
+                    label="My Label3"
+                    inputProps={{
+                      style: {
+                        backgroundColor: `rgba(255, 255, 255, 1)`,
+                        border: `1px solid rgba(0, 0, 0, 1)`,
+                        boxSizing: `border-box`,
+                        width: `74px`,
+                        height: `24px`,
+                        position: `absolute`,
+                        left: `0px`,
+                        top: `0px`,
+                      },
+                    }}
+                    value={selectedMin}
+                    onChange={(e) => setSelectedMin(Number(e.target.value))}
+                  />
                 </Group7>
                 <People>{`people`}</People>
                 <Q>{`~`}</Q>
                 <Group8>
-                  <Rectangle44></Rectangle44>
+                  <TextField
+                    label="My Label4"
+                    inputProps={{
+                      style: {
+                        backgroundColor: `rgba(255, 255, 255, 1)`,
+                        border: `1px solid rgba(0, 0, 0, 1)`,
+                        boxSizing: `border-box`,
+                        width: `74px`,
+                        height: `24px`,
+                        position: `absolute`,
+                        left: `0px`,
+                        top: `0px`,
+                      },
+                    }}
+                    value={selectedMax}
+                    onChange={(e) => setSelectedMax(Number(e.target.value))}
+                  />
                 </Group8>
                 <To1>{`to`}</To1>
-                <AddNewSection>{`+ add new section`}</AddNewSection>
-                <span
-                  style={{
-                    textAlign: `left`,
-                    whiteSpace: `pre-wrap`,
-                    fontSynthesis: `none`,
-                    color: `rgba(50, 181, 255, 1)`,
-                    fontStyle: `normal`,
-                    fontFamily: `Alatsi`,
-                    fontWeight: `400`,
-                    fontSize: `24px`,
-                    letterSpacing: `0.24px`,
-                    textDecoration: `none`,
-                    textTransform: `none`,
-                    position: `absolute`,
-                    left: `193px`,
-                    top: `434px`,
-                  }}
-                  onClick={addAttribute}
-                >
-                  Add Attribute
-                </span>
-                {attributes.map((attr, index) => (
-                  <Box key={index}>
-                    <TextField
-                      label="Attribute"
-                      value={attr.name}
-                      onChange={(e) => {
-                        const newAttributes = [...attributes];
-                        newAttributes[index].name = e.target.value;
-                        setAttributes(newAttributes);
-                      }}
-                    />
-                    <TextField
-                      label="Max People"
-                      type="number"
-                      value={attr.max_people}
-                      onChange={(e) => {
-                        const newAttributes = [...attributes];
-                        newAttributes[index].max_people = Number(
-                          e.target.value
-                        );
-                        setAttributes(newAttributes);
-                      }}
-                    />
-                    <TextField
-                      label="Min People"
-                      type="number"
-                      value={attr.min_people}
-                      onChange={(e) => {
-                        const newAttributes = [...attributes];
-                        newAttributes[index].min_people = Number(
-                          e.target.value
-                        );
-                        setAttributes(newAttributes);
-                      }}
-                    />
-                  </Box>
-                ))}
-                <AddPreference>{`+ add preference`}</AddPreference>
-                <Rectangle8></Rectangle8>
+                <AddAttribute>{`Add Attribute`}</AddAttribute>
+                <AddPreference>{`Add Preference`}</AddPreference>
                 <Group6>
                   <Line1></Line1>
                   <Line2></Line2>
                 </Group6>
-                <Enter>{`Enter`}</Enter>
-                <Group9>
-                  <Attributes>{`attributes`}</Attributes>
-                  <Needed>{`needed`}</Needed>
-                  <Q1>{`~`}</Q1>
-                  <Rectangle6></Rectangle6>
-                  <Rectangle71></Rectangle71>
-                  <Group3>
-                    <Rectangle5></Rectangle5>
-                  </Group3>
-                </Group9>
-                <Preference>{`preference`}</Preference>
-                <ShouldBe>{`should be `}</ShouldBe>
-                <Group31>
-                  <Rectangle51></Rectangle51>
-                </Group31>
                 <Line5></Line5>
                 <Line6></Line6>
-                <Group111>
-                  <Rectangle45></Rectangle45>
-                </Group111>
-                <Group12>
-                  <Rectangle46></Rectangle46>
-                  <Dvided>{`dvided`}</Dvided>
-                  <Together>{`together`}</Together>
-                </Group12>
-                <Rectangle10></Rectangle10>
-                <Rectangle11></Rectangle11>
-                <From1>{`from`}</From1>
-                <Section1>{`Section`}</Section1>
-                <To2>{`to`}</To2>
-                <Group91>
-                  <Rectangle47></Rectangle47>
-                  {/* <Polygon13 src={Polygon13Image} loading='lazy' alt={"Polygon 1"}/> */}
-                </Group91>
-                <Group10>
-                  <Rectangle48></Rectangle48>
-                  {/* <Polygon14 src={Polygon14Image} loading='lazy' alt={"Polygon 1"}/> */}
-                </Group10>
-                <Group112>
-                  <Rectangle49></Rectangle49>
-                </Group112>
-                <People1>{`people`}</People1>
-                <Q2>{`~`}</Q2>
-                <Group121>
-                  <Rectangle410></Rectangle410>
-                </Group121>
-                <To3>{`to`}</To3>
-                <AddAttribute1>{`+ add attribute`}</AddAttribute1>
-                <AddPreference1>{`+ add preference`}</AddPreference1>
-                <Line51></Line51>
-                <Line61></Line61>
               </DateDetail1>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handlePopupClose} color="primary">
-                閉じる
+              <Button
+                variant="contained"
+                onClick={handlePopupClose}
+                color="primary"
+              >
+                Enter
               </Button>
             </DialogActions>
           </Dialog>
