@@ -2,6 +2,8 @@
 
 [![IMAGE ALT TEXT HERE](https://jphacks.com/wp-content/uploads/2023/07/JPHACKS2023_ogp.png)](https://www.youtube.com/watch?v=yYRQEdfGjEg)
 
+## 発表スライド
+https://docs.google.com/presentation/d/16T2h_dpMZf4FAdIHDdQWfNyYTskcQmF9Do2RnIK7cfI/edit#slide=id.p
 
 ## 動作方法
 
