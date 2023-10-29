@@ -1,8 +1,7 @@
 import logging
 import sqlite3
-from abc import ABCMeta, abstractmethod
 
-from pydantic.types import OptionalInt
+from typing import Optional
 
 logger = logging.getLogger("uvicorn")
 logger.level = logging.DEBUG
@@ -10,13 +9,13 @@ logger.level = logging.DEBUG
 db_path = "../db/db.sqlite"
 
 class UserRepository:
-    def add_user(self, name, group_id):
+    def add_user(self, name: str, group_id: str) -> Optional[int]:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
             cur.execute(
-                """INSERT INTO users(user_name, group_id) VALUES (?, ?) RETURNING id;""", (name, group_id))
-            res = cur.fetchall()[0][0]
+                """INSERT INTO users(user_name, group_id) VALUES (?, ?);""", (name, group_id))
+            res = cur.lastrowid
             con.commit()
             con.close()
             return res
@@ -24,7 +23,23 @@ class UserRepository:
             logger.debug(err)
             return None
 
-    def add_user_attributes(self, user_id, attr_id, value):
+    def get_user_id_by_name(self, name: str, group_id: str) -> Optional[int]:
+        try:
+            con = sqlite3.connect(db_path)
+            cur = con.cursor()
+            cur.execute(
+                """SELECT id from users where user_name = ? and group_id = ?""", (name, group_id))
+            res = cur.fetchall()
+            con.close()
+            if len(res) > 0:
+                return res[0][0]
+            else:
+                return None
+        except sqlite3.Error as err:
+            logger.debug(err)
+            return None
+
+    def add_user_attributes(self, user_id:int, attr_id: int, value: bool) -> bool:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
@@ -37,7 +52,7 @@ class UserRepository:
             logger.debug(err)
             return False
 
-    def add_user_dates(self, user_id, date, time_from, time_to):
+    def add_user_dates(self, user_id: int, date: str, time_from: str, time_to:str) -> bool:
         try:
             con = sqlite3.connect(db_path)
             cur = con.cursor()
