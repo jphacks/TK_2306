@@ -135,6 +135,34 @@ class Optimize:
                         score = score + len(common) - len(symmetric_difference)
                     if self.constraints[i][1] == 1:#同じ日に同じ属性を散らしたい
                         score = score - len(common) + len(symmetric_difference)
+        
+        samples = 10
+        continuous_time = 2
+        penalty = 0
+        for _ in range(samples):
+            day = random.randint(0,self.days-1)
+            hour = random.randint(0,47)
+            workers = sche.shift[day][hour]
+            if not bool(workers):
+                continue
+            worker = workers.pop()
+            workers.add(worker)
+            begin,end=hour,hour
+            while begin>0:
+                if worker in sche.shift[day][begin-1]:
+                    begin-=1
+                else:
+                    break
+            while end<46:
+                if worker in sche.shift[day][end+1]:
+                    end+=1
+                else:
+                    break
+            if end-begin+1<continuous_time:
+                penalty += 1
+
+        score -= penalty
+
         return score
     # 焼きなまし法の実装
     def simulated_annealing(self,initial_sche:Schedule, initial_temperature, cooling_rate, max_time):
