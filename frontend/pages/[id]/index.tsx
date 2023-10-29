@@ -6,9 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import TimeSlotTable from "./timeslottable";
 import CheckBoxGroup from "./checkbox";
 import Banner from "../../components/Banner";
-import { dateCalendarClasses } from "@mui/x-date-pickers-pro";
-import { set } from "react-hook-form";
-import { useForm, Controller, useFieldArray, Control } from "react-hook-form";
+import { useForm} from "react-hook-form";
 import { get } from "http";
 
 type UserAttribute = {
@@ -22,23 +20,6 @@ type DateCandidate = {
   time_to: string;
 };
 
-type UserPreference = {
-  name: string;
-};
-
-type TimeSlotTableProps = {
-  dates: Date[][];
-  candidateTimes: string[];
-  onPreferenceChange: (date: Date, time: string) => void;
-};
-
-type UserShift = {
-  date: string;
-  from: string;
-  to: string;
-  status: "○" | "△" | "×";
-};
-
 const UserPage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -47,7 +28,7 @@ const UserPage: React.FC = () => {
   const [dates, setDates] = useState<string[]>([]);
   const [attribute, setAttributes] = useState<UserAttribute[]>([]);
   const [candidateTimes, setCandidateTimes] = useState<string[][]>([]);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<{attr_id: number, value: boolean}[]>([]);
   const { register, control, getValues, setValue } = useForm<{
     dates: {
       from_time: string;
@@ -67,8 +48,10 @@ const UserPage: React.FC = () => {
       })
       .then(async (response) => {
         setAttributes(response["attrs"]);
+        setSelectedOptions(response["attrs"].map((attr: UserAttribute) => ({attr_id: attr.id, value: false})));
         console.log("User attributes:", response["attrs"]);
       });
+    
     fetch(`http://localhost:9000/dates/${id}`)
       .then(async (response) => {
         if (!response.ok) {
@@ -94,17 +77,6 @@ const UserPage: React.FC = () => {
       });
   }, [id]);
 
-  const getAttributes = () => {
-    var res = [];
-    for (var attr of attribute) {
-      if (selectedOptions.includes(attr.name)) {
-        res.push({ attr_id: attr.id, value: true });
-      } else {
-        res.push({ attr_id: attr.id, value: false });
-      }
-    }
-    return res;
-  };
 
   const getCandidates = () => {
     const values = getValues();
@@ -121,7 +93,12 @@ const UserPage: React.FC = () => {
     return res;
   };
 
+  const getAttributes = () => {
+    return selectedOptions.map(option => ({attr_id: option.attr_id, value: option.value}))
+  }
+
   const handleSubmit = async () => {
+    console.log("Selected options:", selectedOptions)
     const postData = {
       group_id: id,
       name: userName,
